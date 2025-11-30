@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using WhiteBinTools.Filelist;
 using WhiteBinTools.Support;
-using WhiteBinTools.WhiteBinTools;
 using static WhiteBinTools.Support.LibaryEnums;
 
 namespace WhiteBinTools.Repack;

@@ -12,10 +12,10 @@ internal static class RepackProcesses
 
     public static void PrepareRepackVars(RepackVariables repackVariables, string filelistFile, FilelistVariables filelistVariables, string extractedDir)
     {
-        repackVariables.FilelistFileName = Path.GetFileName(filelistFile);
+        repackVariables.FilelistFileName = Path.GetFileName(filelistFile) ?? string.Empty;
         repackVariables.NewFilelistFile = Path.Combine(filelistVariables.MainFilelistDirectory, repackVariables.FilelistFileName);
         repackVariables.NewWhiteBinFileName = Path.GetFileName(extractedDir).Remove(0, 1);
-        repackVariables.NewWhiteBinFile = Path.Combine(Path.GetDirectoryName(extractedDir), repackVariables.NewWhiteBinFileName);
+        repackVariables.NewWhiteBinFile = Path.Combine(Path.GetDirectoryName(extractedDir) ?? string.Empty, repackVariables.NewWhiteBinFileName);
     }
 
 
@@ -63,7 +63,7 @@ internal static class RepackProcesses
         }
         else
         {
-            repackVariables.OgDirectoryPath = Path.GetDirectoryName(repackVariables.OgMainPath);
+            repackVariables.OgDirectoryPath = Path.GetDirectoryName(repackVariables.OgMainPath) ?? string.Empty;
             repackVariables.OgFileName = Path.GetFileName(repackVariables.OgMainPath);
             repackVariables.OgFullFilePath = Path.Combine(extractedDir, repackVariables.OgDirectoryPath, repackVariables.OgFileName);
             repackVariables.RepackPathInChunk = repackVariables.OgMainPath.Replace(_pathSeparatorChar, "/");

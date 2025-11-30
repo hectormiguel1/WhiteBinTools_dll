@@ -1,5 +1,4 @@
 ﻿using WhiteBinTools.Support;
-using WhiteBinTools.WhiteBinTools;
 
 namespace WhiteBinTools.Filelist;
 

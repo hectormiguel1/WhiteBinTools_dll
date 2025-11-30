@@ -1,4 +1,4 @@
-namespace WhiteBinTools.WhiteBinTools;
+namespace WhiteBinTools;
 
 public static class GlobalConfig
 {

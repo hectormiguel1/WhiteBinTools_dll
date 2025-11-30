@@ -1,8 +1,10 @@
-﻿namespace WhiteBinTools.Crypto;
+﻿using System.Collections.Immutable;
+
+namespace WhiteBinTools.Crypto;
 
 internal static class IntegersArray
 {
-    public static readonly byte[] Integers =
+    public static readonly ImmutableArray<byte> Integers =
     [
         120, 121, 122, 123, 124, 125, 126, 127,
         128, 129, 130, 131, 132, 133, 134, 135,

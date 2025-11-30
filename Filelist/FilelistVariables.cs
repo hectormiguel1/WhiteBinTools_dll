@@ -1,6 +1,6 @@
 ﻿namespace WhiteBinTools.Filelist;
 
-internal class FilelistVariables
+public class FilelistVariables
 {
     // Program variables
     public string MainFilelistFile { get; set; }

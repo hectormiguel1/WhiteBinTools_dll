@@ -2,7 +2,6 @@
 using WhiteBinTools.Repack;
 using WhiteBinTools.Support;
 using WhiteBinTools.Support.Extensions;
-using WhiteBinTools.WhiteBinTools;
 using static WhiteBinTools.Support.LibaryEnums;
 
 namespace WhiteBinTools.Filelist;

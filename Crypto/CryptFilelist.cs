@@ -1,6 +1,5 @@
 ﻿using WhiteBinTools.Support;
 using WhiteBinTools.Support.Extensions;
-using WhiteBinTools.WhiteBinTools;
 using static WhiteBinTools.Support.LibaryEnums;
 
 namespace WhiteBinTools.Crypto;
@@ -36,7 +35,7 @@ internal static class CryptFilelist
         var seedArray8Bytes = (ulong)((baseSeedArray[9] << 24) | (baseSeedArray[12] << 16) | (baseSeedArray[2] << 8) | (baseSeedArray[0]));
         var seedArray = BitConverter.GetBytes(seedArray8Bytes);
 
-        var xorTable = Generator.GenerateXORtable(seedArray, false);
+        var xorTable = Generator.GenerateXoRTable(seedArray, false);
 
         switch (cryptAction)
         {
@@ -111,7 +110,7 @@ internal static class CryptFilelist
     private static void CreateFinalFile(string ogFile, string processedFile)
     {
         var ogFileName = Path.GetFileName(ogFile);
-        var ogFileDir = Path.GetDirectoryName(ogFile);
+        var ogFileDir = Path.GetDirectoryName(ogFile) ?? string.Empty;
         var newFile = Path.Combine(ogFileDir, ogFileName);
 
         File.Delete(ogFile);

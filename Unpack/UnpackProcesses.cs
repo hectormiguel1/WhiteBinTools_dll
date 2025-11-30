@@ -1,7 +1,6 @@
 ﻿using WhiteBinTools.Filelist;
 using WhiteBinTools.Support;
 using WhiteBinTools.Support.Extensions;
-using WhiteBinTools.WhiteBinTools;
 using static WhiteBinTools.Support.LibaryEnums;
 
 namespace WhiteBinTools.Unpack;
@@ -70,7 +69,7 @@ internal static class UnpackProcesses
     // ---------------------------------------------------------
     // NEW: Shared Extraction Logic (Replaces Logic in A, B, C)
     // ---------------------------------------------------------
-    public static void ExtractFiles(GameCodes gameCode, string filelistFile, string whiteBinFile, Func<FilelistVariables, bool> shouldExtractPredicate)
+    public static void ExtractFiles(GameCodes gameCode, string filelistFile, string whiteBinFile, Func<FilelistVariables, bool>? shouldExtractPredicate)
     {
         var vars = InitializeFilelist(gameCode, filelistFile);
         var unpackVars = new UnpackVariables();
@@ -138,7 +137,7 @@ internal static class UnpackProcesses
     {
         unpackVariables.WhiteBinName = Path.GetFileName(whiteBinFile);
         var inBinFilePath = Path.GetFullPath(whiteBinFile);
-        unpackVariables.InBinFileDir = Path.GetDirectoryName(inBinFilePath);
+        unpackVariables.InBinFileDir = Path.GetDirectoryName(inBinFilePath) ?? string.Empty;
         unpackVariables.ExtractDirName = Path.GetFileName(whiteBinFile);
         unpackVariables.ExtractDir = Path.Combine(unpackVariables.InBinFileDir, "_" + unpackVariables.ExtractDirName);
     }
@@ -162,7 +161,7 @@ internal static class UnpackProcesses
         }
         else
         {
-            filelistVariables.DirectoryPath = Path.GetDirectoryName(filelistVariables.MainPath);
+            filelistVariables.DirectoryPath = Path.GetDirectoryName(filelistVariables.MainPath) ?? string.Empty;
             filelistVariables.FileName = Path.GetFileName(filelistVariables.MainPath);
             filelistVariables.FullFilePath = Path.Combine(extractDir, filelistVariables.DirectoryPath, filelistVariables.FileName);
         }

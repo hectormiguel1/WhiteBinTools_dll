@@ -8,7 +8,7 @@ internal static class CryptoFunctions
 
         while (byteIterator < 8)
         {
-            int integerVal = IntegersArray.Integers[decryptedByte];
+            int integerVal = IntegersArray.Integers[(int)decryptedByte];
 
             var xorTableByte = xorTable[tableOffset + byteIterator];
             var computedValue = integerVal - xorTableByte;
@@ -54,7 +54,8 @@ internal static class CryptoFunctions
                 integerValUsed = Convert.ToInt32(negativeHexVal, 16) + xorTableByte;
             }
 
-            byteToEncrypt = (byte)Array.IndexOf(IntegersArray.Integers, (byte)integerValUsed);
+            
+            byteToEncrypt = (byte)IntegersArray.Integers.IndexOf((byte)integerValUsed);
 
             byteIterator--;
         }

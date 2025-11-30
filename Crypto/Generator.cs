@@ -2,7 +2,7 @@
 
 internal static class Generator
 {
-    public static byte[] GenerateXORtable(byte[] seedArray, bool logDisplay)
+    public static byte[] GenerateXoRTable(byte[] seedArray, bool logDisplay)
     {
         var xorTable = new byte[264];
 
