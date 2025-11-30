@@ -20,8 +20,8 @@ internal static class Encryption
             [bytesToEncrypt[3], bytesToEncrypt[2], bytesToEncrypt[1], bytesToEncrypt[0]
             ];
 
-            var bytesToEncryptLowerVal = bytesToEncryptLowerArray.ArrayToFFNum();
-            var bytesToEncryptHigherVal = bytesToEncryptHigherArray.ArrayToFFNum();
+            var bytesToEncryptLowerVal = bytesToEncryptLowerArray.ArrayToFfNum();
+            var bytesToEncryptHigherVal = bytesToEncryptHigherArray.ArrayToFfNum();
 
 
             // Setup BlockCounter variables
@@ -32,7 +32,7 @@ internal static class Encryption
             // Setup xorBlock variables
             uint xorBlockLowerVal = 0;
             uint xorBlockHigherVal = 0;
-            CryptoBase.XORblockSetup(xorTable, tableOffset, ref xorBlockLowerVal, ref xorBlockHigherVal);
+            CryptoBase.XoRBlockSetup(xorTable, tableOffset, ref xorBlockLowerVal, ref xorBlockHigherVal);
 
 
             // Setup SpecialKey variables

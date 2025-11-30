@@ -37,14 +37,14 @@ internal static class CryptoBase
         BlockCounterFval |= blockCounterDval;
     }
 
-    public static void XORblockSetup(byte[] xorTable, uint tableOffset, ref uint xorBlockLowerVal, ref uint xorBlockHigherVal)
+    public static void XoRBlockSetup(byte[] xorTable, uint tableOffset, ref uint xorBlockLowerVal, ref uint xorBlockHigherVal)
     {
-        var currentXORblock = new[] { xorTable[tableOffset + 0], xorTable[tableOffset + 1], 
+        var currentXoRBlock = new[] { xorTable[tableOffset + 0], xorTable[tableOffset + 1], 
             xorTable[tableOffset + 2], xorTable[tableOffset + 3], xorTable[tableOffset + 4], 
             xorTable[tableOffset + 5], xorTable[tableOffset + 6], xorTable[tableOffset + 7] };
 
-        xorBlockLowerVal = BitConverter.ToUInt32(currentXORblock, 0);
-        xorBlockHigherVal = BitConverter.ToUInt32(currentXORblock, 4);
+        xorBlockLowerVal = BitConverter.ToUInt32(currentXoRBlock, 0);
+        xorBlockHigherVal = BitConverter.ToUInt32(currentXoRBlock, 4);
     }
 
     public static void SpecialKeySetup(ref uint carryFlag, ref long specialKey1, ref long specialKey2)

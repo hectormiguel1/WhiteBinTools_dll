@@ -23,7 +23,7 @@ public class RepackTypeD
         {
             // Get all the necessary information
             // from the #info.txt file
-            case GameCodes.ff131:
+            case GameCodes.Ff131:
             {
                 if (infoFileLines.Length < 2)
                 {
@@ -37,7 +37,7 @@ public class RepackTypeD
                 filelistVariables.TotalChunks = uint.Parse(infoFileLines[1].Split(' ')[1]);
                 break;
             }
-            case GameCodes.ff132:
+            case GameCodes.Ff132:
             {
                 if (infoFileLines.Length < 3)
                 {
@@ -123,7 +123,7 @@ public class RepackTypeD
         // the odd number chunks if the code
         // is set to 2
         var oddChunkNumValues = new List<int>();
-        if (gameCode == GameCodes.ff132 && filelistVariables.TotalChunks > 1)
+        if (gameCode == GameCodes.Ff132 && filelistVariables.TotalChunks > 1)
         {
             var nextChunkNo = 1;
             for (var i = 0; i < filelistVariables.TotalChunks; i++)
@@ -159,7 +159,7 @@ public class RepackTypeD
 
                         switch (gameCode)
                         {
-                            case GameCodes.ff131:
+                            case GameCodes.Ff131:
                             {
                                 if (currentEntryData.Length < 2)
                                 {
@@ -184,7 +184,7 @@ public class RepackTypeD
                                 filelistVariables.PathString = currentEntryData[1];
                                 break;
                             }
-                            case GameCodes.ff132:
+                            case GameCodes.Ff132:
                             {
                                 if (currentEntryData.Length < 3)
                                 {
@@ -195,7 +195,7 @@ public class RepackTypeD
                                 filelistVariables.FileCode = uint.Parse(currentEntryData[0]);
 
                                 CheckChunkEntryData(currentEntryData[1], ValueTypes.Byte, c, l);
-                                filelistVariables.FileTypeID = byte.Parse(currentEntryData[1]);
+                                filelistVariables.FileTypeId = byte.Parse(currentEntryData[1]);
 
                                 entriesWriter.BaseStream.Position = entriesWriterPos;
                                 entriesWriter.WriteBytesUInt32(filelistVariables.FileCode, false);
@@ -222,7 +222,7 @@ public class RepackTypeD
 
                                 // Write FileTypeID
                                 entriesWriter.BaseStream.Position = entriesWriterPos + 7;
-                                entriesWriter.Write(filelistVariables.FileTypeID);
+                                entriesWriter.Write(filelistVariables.FileTypeId);
 
                                 filelistVariables.PathString = currentEntryData[2];
                                 break;

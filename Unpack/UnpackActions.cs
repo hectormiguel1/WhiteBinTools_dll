@@ -1,19 +1,20 @@
 using System.Text;
+using WhiteBinTools.Native;
 using WhiteBinTools.Support;
 
 namespace WhiteBinTools.Unpack;
 
 public class UnpackActions
 {
-    public static void UnpackFull(LibaryEnums.GameCodes gameCode, string filelistFile, string whiteBinFile)
+    public static void UnpackFull(LibaryEnums.GameCodes gameCode, string filelistFile, string whiteBinFile, string? whiteExtractedDir = null)
     {
         // TypeA specific: Deletes the directory if it exists before starting
         var tempVars = new UnpackVariables();
-        UnpackProcesses.PrepareBinVars(whiteBinFile, tempVars);
+        UnpackProcesses.PrepareBinVars(whiteBinFile, tempVars, whiteExtractedDir);
         
         if (Directory.Exists(tempVars.ExtractDir))
         {
-            Console.WriteLine("Detected previous unpack. deleting....");
+            NativeLogger.Warn("Detected previous unpack. deleting....");
             CommonMethods.IfDirExistsDel(tempVars.ExtractDir);
         }
 
@@ -21,12 +22,12 @@ public class UnpackActions
         UnpackProcesses.ExtractFiles(gameCode, filelistFile, whiteBinFile, _ => true);
     }
     
-    public static void UnpackSingle(LibaryEnums.GameCodes gameCode, string filelistFile, string whiteBinFile, string whiteFilePath)
+    public static void UnpackSingle(LibaryEnums.GameCodes gameCode, string filelistFile, string whiteBinFile, string whiteFilePath, string? whiteExtractedDir = null)
     {
-        UnpackProcesses.ExtractFiles(gameCode, filelistFile, whiteBinFile, vars => vars.MainPath == whiteFilePath);
+        UnpackProcesses.ExtractFiles(gameCode, filelistFile, whiteBinFile, vars => vars.MainPath == whiteFilePath, whiteExtractedDir);
     }
     
-    public static void UnpackMultiple(LibaryEnums.GameCodes gameCode, string filelistFile, string whiteBinFile, string whiteVirtualDirPath)
+    public static void UnpackMultiple(LibaryEnums.GameCodes gameCode, string filelistFile, string whiteBinFile, string whiteVirtualDirPath, string? whiteExtractedDir = null)
     {
         // Pre-process the input string
         var targetDir = whiteVirtualDirPath.Replace("*", "");
@@ -44,7 +45,7 @@ public class UnpackActions
             }
 
             return assembledDir == targetDir;
-        });
+        }, whiteExtractedDir);
     }
     
     public static void UnpackFilelist(LibaryEnums.GameCodes gameCode, string filelistFile)
@@ -62,7 +63,7 @@ public class UnpackActions
         // Write Info Header
         using (var infoStreamWriter = new StreamWriter(Path.Combine(extractedFilelistDir, "#info.txt"), true))
         {
-            if (gameCode == LibaryEnums.GameCodes.ff132)
+            if (gameCode == LibaryEnums.GameCodes.Ff132)
             {
                 infoStreamWriter.WriteLine($"encrypted: {vars.IsEncrypted.ToString().ToLower()}");
                 if (vars.IsEncrypted)
@@ -88,13 +89,13 @@ public class UnpackActions
         {
             var stringData = $"{vars.FileCode}|";
             
-            if (gameCode == LibaryEnums.GameCodes.ff132)
+            if (gameCode == LibaryEnums.GameCodes.Ff132)
             {
-                stringData += $"{vars.FileTypeID}|";
+                stringData += $"{vars.FileTypeId}|";
             }
             stringData += vars.PathString;
 
-            var chunkKey = (gameCode == LibaryEnums.GameCodes.ff131) ? vars.ChunkNumber : vars.CurrentChunkNumber;
+            var chunkKey = (gameCode == LibaryEnums.GameCodes.Ff131) ? vars.ChunkNumber : vars.CurrentChunkNumber;
             outChunksDict[chunkKey].Add(stringData);
         });
 
@@ -108,7 +109,7 @@ public class UnpackActions
             }
         }
 
-        Console.WriteLine($"\nFinished unpacking \"{filelistOutName}\"");
+        NativeLogger.Debug($"Finished unpacking \"{filelistOutName}\"");
     }
     
     public static void UnpackFilelistPaths(LibaryEnums.GameCodes gameCode, string filelistFile)
@@ -127,6 +128,6 @@ public class UnpackActions
             outchunkWriter.WriteLine("end");
         }
 
-        Console.WriteLine($"\nFinished writing filepaths to \"{Path.GetFileName(outTxtFile)}\"");
+        NativeLogger.Debug($"Finished writing filepaths to \"{Path.GetFileName(outTxtFile)}\"");
     }
 }

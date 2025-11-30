@@ -4,14 +4,14 @@ public static class LibaryEnums
 {
     public enum GameCodes
     {
-        ff131,
-        ff132
+        Ff131,
+        Ff132
     }
 
 
     public enum CryptActions
     {
-        d,
-        e
+        D,
+        E
     }
 }

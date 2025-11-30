@@ -64,7 +64,7 @@ internal static class Decryption
             // Setup xorBlock variables
             uint xorBlockLowerVal = 0;
             uint xorBlockHigherVal = 0;
-            CryptoBase.XORblockSetup(xorTable, tableOffset, ref xorBlockLowerVal, ref xorBlockHigherVal);
+            CryptoBase.XoRBlockSetup(xorTable, tableOffset, ref xorBlockLowerVal, ref xorBlockHigherVal);
 
 
             // Setup SpecialKey variables

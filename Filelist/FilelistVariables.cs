@@ -35,7 +35,7 @@ public class FilelistVariables
     public uint FileCode { get; set; }
     public int ChunkNumber { get; set; }
     public ushort PathStringPos { get; set; }
-    public byte FileTypeID { get; set; }
+    public byte FileTypeId { get; set; }
 
     // Program variables
     // (For a string in chunk)

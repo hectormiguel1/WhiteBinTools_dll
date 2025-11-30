@@ -24,18 +24,18 @@ internal static class FilelistProcesses
 
         switch (gameCode)
         {
-            case GameCodes.ff131:
+            case GameCodes.Ff131:
                 filelistVariables.ChunkNumber = entriesReader.ReadUInt16();
                 filelistVariables.PathStringPos = entriesReader.ReadUInt16();
                 filelistVariables.LastChunkNumber = filelistVariables.ChunkNumber;
 
                 GeneratePathString(filelistVariables.PathStringPos, filelistVariables.ChunkDataDict[filelistVariables.ChunkNumber], filelistVariables);
                 break;
-            case GameCodes.ff132:
+            case GameCodes.Ff132:
             {
                 filelistVariables.PathStringPos = entriesReader.ReadUInt16();
                 filelistVariables.ChunkNumber = entriesReader.ReadByte();
-                filelistVariables.FileTypeID = entriesReader.ReadByte();
+                filelistVariables.FileTypeId = entriesReader.ReadByte();
                 filelistVariables.LastChunkNumber = filelistVariables.CurrentChunkNumber;
 
                 switch (filelistVariables.PathStringPos)

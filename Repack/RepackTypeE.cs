@@ -15,7 +15,7 @@ public class RepackTypeE
         using var jsonReader = new StreamReader(jsonFile);
         _ = jsonReader.ReadLine();
 
-        if (gameCode == GameCodes.ff132)
+        if (gameCode == GameCodes.Ff132)
         {
             // Determine encryption status
             filelistVariables.IsEncrypted = bool.Parse(CheckGetMainProperty(jsonReader, "\"encrypted\"", ValueTypes.Boolean));
@@ -79,7 +79,7 @@ public class RepackTypeE
         // the odd number chunks if the code
         // is set to 2
         var oddChunkNumValues = new List<int>();
-        if (gameCode == GameCodes.ff132 && filelistVariables.TotalChunks > 1)
+        if (gameCode == GameCodes.Ff132 && filelistVariables.TotalChunks > 1)
         {
             var nextChunkNo = 1;
             for (var i = 0; i < filelistVariables.TotalChunks; i++)
@@ -142,7 +142,7 @@ public class RepackTypeE
 
                         switch (gameCode)
                         {
-                            case GameCodes.ff131:
+                            case GameCodes.Ff131:
                                 // Write chunk number
                                 entriesWriter.BaseStream.Position = entriesWriterPos + 4;
                                 entriesWriter.WriteBytesUInt16((ushort)c, false);
@@ -151,11 +151,11 @@ public class RepackTypeE
                                 entriesWriter.BaseStream.Position = entriesWriterPos + 6;
                                 entriesWriter.WriteBytesUInt16(0, false);
                                 break;
-                            case GameCodes.ff132:
+                            case GameCodes.Ff132:
                             {
                                 currentJsonLine = jsonReader.ReadLine().TrimStart(' ').TrimEnd(' ');
                                 currentEntryPropertyValue = CheckGetChunkEntryProperty(currentJsonLine, "\"fileTypeID\"", c, ValueTypes.Byte);
-                                filelistVariables.FileTypeID = byte.Parse(currentEntryPropertyValue);
+                                filelistVariables.FileTypeId = byte.Parse(currentEntryPropertyValue);
 
                                 entriesWriter.BaseStream.Position = entriesWriterPos + 4;
 
@@ -179,7 +179,7 @@ public class RepackTypeE
 
                                 // Write FileTypeID
                                 entriesWriter.BaseStream.Position = entriesWriterPos + 7;
-                                entriesWriter.Write(filelistVariables.FileTypeID);
+                                entriesWriter.Write(filelistVariables.FileTypeId);
                                 break;
                             }
                         }

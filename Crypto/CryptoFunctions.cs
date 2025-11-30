@@ -28,7 +28,7 @@ internal static class CryptoFunctions
         return decryptedByte;
     }
 
-    public static long ArrayToFFNum(this byte[] byteArray)
+    public static long ArrayToFfNum(this byte[] byteArray)
     {
         var hexValue = "FFFFFFFF";
         hexValue += byteArray[0].ToString("X2") + "" + byteArray[1].ToString("X2") + "" + byteArray[2].ToString("X2") +

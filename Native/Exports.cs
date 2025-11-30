@@ -1,13 +1,19 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace WhiteBinTools.Native;
 
 public static class Exports
 {
-    static Exports()
+    [ModuleInitializer]
+    public static void Init()
     {   
         System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
     }
+    public const int SuccessReturn = 0;
+    public const int ExceptionError = 1;
+    public const int InvalidArgsError = -1;
+    public const int FileNotFoundError = -2;
     
     
     public static NativeStructs.FileEntryList MarshalListToArray(List<NativeStructs.FileEntry> list)

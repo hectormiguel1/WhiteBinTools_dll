@@ -1,9 +1,6 @@
 #ifndef WBT_SHARED_H
 #define WBT_SHARED_H
 
-#include <stddef.h>
-#include <stdint.h>
-
 /* =======================================================================
  * Platform & Visibility Macros
  * ======================================================================= */
@@ -27,13 +24,29 @@ extern "C" {
 
     // Represents a boolean value (0 = false, 1 = true).
     // Using uint8_t ensures 1-byte alignment to match C# 'byte'.
-    typedef uint8_t WbtBool;
+    typedef unsigned char WBT_BOOL;
 
     // Game Identifier Enum
     typedef enum {
-        WBT_GAME_FF131 = 0,
-        WBT_GAME_FF132 = 1
+        FF131 = 0,
+        FF132 = 1
     } GameCode;
+    
+    /* =======================================================================
+ * Struct Definitions (Must match NativeStructs.cs layout)
+ * ======================================================================= */
+    
+    typedef struct {
+        int chunk_index;
+        unsigned long file_code;
+        unsigned int file_type_id; // Used for ff13-2
+        char* file_path;      // UTF-8 String
+    } FileEntry;
+
+    typedef struct {
+        FileEntry* items;     // Array pointer
+        unsigned int count;
+    } FileEntryList;
 
     /* =======================================================================
      * Error Codes

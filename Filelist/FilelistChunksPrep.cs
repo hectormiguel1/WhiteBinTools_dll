@@ -1,4 +1,5 @@
-﻿using WhiteBinTools.Support;
+﻿using WhiteBinTools.Native;
+using WhiteBinTools.Support;
 
 namespace WhiteBinTools.Filelist;
 
@@ -36,8 +37,8 @@ internal static class FilelistChunksPrep
         filelistVariables.ChunkInfoSize = filelistVariables.ChunkDataSectionOffset - filelistVariables.ChunkInfoSectionOffset;
         filelistVariables.TotalChunks = filelistVariables.ChunkInfoSize / 12;
 
-        Console.WriteLine("TotalChunks: " + filelistVariables.TotalChunks);
-        Console.WriteLine("No of files: " + filelistVariables.TotalFiles + "\n");
+        NativeLogger.Debug($"TotalChunks: {filelistVariables.TotalChunks}");
+        NativeLogger.Debug($"No of files: {filelistVariables.TotalFiles}");
     }
 
 

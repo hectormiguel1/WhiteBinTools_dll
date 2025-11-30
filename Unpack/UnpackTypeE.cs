@@ -23,7 +23,7 @@ public class UnpackTypeE
             }
         }
 
-        if (gameCode == GameCodes.ff132)
+        if (gameCode == GameCodes.Ff132)
         {
             filelistVariables.CurrentChunkNumber = -1;
         }
@@ -54,7 +54,7 @@ public class UnpackTypeE
         {
             outJsonWriter.WriteLine("{");
 
-            if (gameCode == GameCodes.ff132)
+            if (gameCode == GameCodes.Ff132)
             {
                 outJsonWriter.WriteLine($"  \"encrypted\": {filelistVariables.IsEncrypted.ToString().ToLower()},");
 
@@ -90,7 +90,7 @@ public class UnpackTypeE
                         FilelistProcesses.GetCurrentFileEntry(gameCode, entriesReader, entriesReadPos, filelistVariables);
                         entriesReadPos += 8;
 
-                        if (gameCode == GameCodes.ff131)
+                        if (gameCode == GameCodes.Ff131)
                         {
                             DetermineArrayClosure(chunkNumberJson, filelistVariables.ChunkNumber, outJsonWriter);
                             chunkNumberJson = filelistVariables.ChunkNumber;
@@ -105,7 +105,7 @@ public class UnpackTypeE
 
                             outJsonWriter.WriteLine("      {");
                             outJsonWriter.WriteLine("        \"fileCode\": " + $"{filelistVariables.FileCode},");
-                            outJsonWriter.WriteLine("        \"fileTypeID\": " + $"{filelistVariables.FileTypeID},");
+                            outJsonWriter.WriteLine("        \"fileTypeID\": " + $"{filelistVariables.FileTypeId},");
                         }
 
                         outJsonWriter.WriteLine("        \"filePath\": " + $"\"{filelistVariables.PathString}\"");

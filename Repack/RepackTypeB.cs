@@ -47,7 +47,7 @@ public class RepackTypeB
 
         CommonMethods.IfFileExistsDel(filelistFile);
 
-        if (gameCode == GameCodes.ff132)
+        if (gameCode == GameCodes.Ff132)
         {
             filelistVariables.CurrentChunkNumber = -1;
         }

@@ -39,7 +39,7 @@ internal static class CryptFilelist
 
         switch (cryptAction)
         {
-            case CryptActions.d:
+            case CryptActions.D:
                 CommonMethods.IfFileExistsDel(inFile + ".dec");
 
                 using (var decryptedStreamBinWriter = new BinaryWriter(File.Open(inFile + ".dec", FileMode.Append, FileAccess.Write)))
@@ -53,13 +53,11 @@ internal static class CryptFilelist
                     inFileReader.BaseStream.Position = decryptedStreamBinWriter.BaseStream.Length;
                     inFileReader.BaseStream.CopyStreamTo(decryptedStreamBinWriter.BaseStream, remainderBytes, false);
                 }
-
-                inFileReader.Dispose();
-
+                
                 CreateFinalFile(inFile, inFile + ".dec");
                 break;
 
-            case CryptActions.e:
+            case CryptActions.E:
                 CommonMethods.IfFileExistsDel(inFile + ".tmp2");
 
                 using (var chkSumStreamBinWriter = new BinaryWriter(File.Open(inFile + ".tmp2", FileMode.Append, FileAccess.Write)))
@@ -80,9 +78,7 @@ internal static class CryptFilelist
                     inFileReader.BaseStream.Position = chkSumStreamBinWriter.BaseStream.Length;
                     inFileReader.BaseStream.CopyStreamTo(chkSumStreamBinWriter.BaseStream, remainderBytes, false);
                 }
-
-                inFileReader.Dispose();
-
+                
                 CommonMethods.IfFileExistsDel(inFile + ".enc");
 
                 using (var inFileReaderTmp = new BinaryReader(File.Open(inFile + ".tmp2", FileMode.Open, FileAccess.Read), GlobalConfig.DefaultEncoding))

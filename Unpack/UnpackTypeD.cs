@@ -48,7 +48,7 @@ public class UnpackTypeD
 
         using (var infoStreamWriter = new StreamWriter(infoFile, true))
         {
-            if (gameCode == GameCodes.ff132)
+            if (gameCode == GameCodes.Ff132)
             {
                 filelistVariables.CurrentChunkNumber = -1;
                 infoStreamWriter.WriteLine($"encrypted: {filelistVariables.IsEncrypted.ToString().ToLower()}");
@@ -94,7 +94,7 @@ public class UnpackTypeD
 
                     var stringData = "";
 
-                    if (gameCode == GameCodes.ff131)
+                    if (gameCode == GameCodes.Ff131)
                     {
                         stringData += filelistVariables.FileCode + "|";
                         stringData += filelistVariables.PathString;
@@ -104,7 +104,7 @@ public class UnpackTypeD
                     else
                     {
                         stringData += filelistVariables.FileCode + "|";
-                        stringData += filelistVariables.FileTypeID + "|";
+                        stringData += filelistVariables.FileTypeId + "|";
                         stringData += filelistVariables.PathString;
 
                         outChunksDict[filelistVariables.CurrentChunkNumber].Add(stringData);

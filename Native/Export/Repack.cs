@@ -10,7 +10,7 @@ public static class Repack
     // =======================================================================
     // Helpers
     // =======================================================================
-    
+
     /// <summary>
     /// safe conversion from C-String (char*) to .NET String.
     /// Returns null if pointer is null.
@@ -26,132 +26,169 @@ public static class Repack
     // =======================================================================
 
     [UnmanagedCallersOnly(EntryPoint = "repack_all", CallConvs = [typeof(CallConvCdecl)])]
-    public static int RepackAll(int gameCode, IntPtr filelistFile, IntPtr extractedDir, byte bckup)
+    public static int RepackAll(int gameCode, IntPtr filesPtr, IntPtr extractedDir, byte backup)
     {
         try
         {
-            var fFile = PtrToString(filelistFile);
+            var fFile = PtrToString(filesPtr);
             var eDir = PtrToString(extractedDir);
+            var shouldBackup = backup != 0;
+            if (string.IsNullOrEmpty(fFile) || string.IsNullOrEmpty(eDir))
+            {
+                NativeLogger.Error(
+                    $"Either files or extractDir are null.\nfiles: {fFile}, extractedDir: {eDir}, backup: {shouldBackup}");
+                return Exports.InvalidArgsError;
+            }
 
-            if (string.IsNullOrEmpty(fFile) || string.IsNullOrEmpty(eDir)) 
-                return -1;
-
+            NativeLogger.Debug(
+                $"Repacking all files fileList: {fFile}, extractedDir: {eDir}, Game: {(LibaryEnums.GameCodes)gameCode}, backup: {shouldBackup}");
             RepackActions.RepackAll(
-                (LibaryEnums.GameCodes)gameCode, 
-                fFile, 
-                eDir, 
-                bckup != 0
+                (LibaryEnums.GameCodes)gameCode,
+                fFile,
+                eDir,
+                shouldBackup
             );
-            return 0;
+            NativeLogger.Info($"Repack for {eDir} completed successfully!");
+            return Exports.SuccessReturn;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[WBT Native Error]: {ex.Message}");
-            return 1;
+            NativeLogger.Error($"Repack failed with error: {ex.Message}");
+            return Exports.ExceptionError;
         }
     }
 
     [UnmanagedCallersOnly(EntryPoint = "repack_single", CallConvs = [typeof(CallConvCdecl)])]
-    public static int RepackSingle(int gameCode, IntPtr filelistFile, IntPtr whiteBinFile, IntPtr targetFilePath, byte bckup)
+    public static int RepackSingle(int gameCode, IntPtr fileListPtr, IntPtr whiteBinPtr, IntPtr targetFilePtr,
+        byte backup)
     {
         try
         {
-            var fFile = PtrToString(filelistFile);
-            var wFile = PtrToString(whiteBinFile);
-            var tPath = PtrToString(targetFilePath);
+            var fFile = PtrToString(fileListPtr);
+            var wFile = PtrToString(whiteBinPtr);
+            var tPath = PtrToString(targetFilePtr);
+            var shouldBackup = backup != 0;
+            var game = (LibaryEnums.GameCodes)gameCode;
+            if (string.IsNullOrEmpty(fFile) || string.IsNullOrEmpty(wFile) || string.IsNullOrEmpty(tPath))
+            {
+                NativeLogger.Error($"Either fileListPtr, whiteBinPtr or targetFilePtr are null.\n" +
+                                   $"fileListPtr: {fFile}, whiteBinPtr: {wFile}, targetFilePtr: {tPath}");
+                return Exports.InvalidArgsError;
+            }
 
-            if (string.IsNullOrEmpty(fFile) || string.IsNullOrEmpty(wFile) || string.IsNullOrEmpty(tPath)) 
-                return -1;
-
+            NativeLogger.Debug($"Repacking single file: {tPath} for game: {game}, backup: {shouldBackup}");
             RepackActions.RepackSingle(
-                (LibaryEnums.GameCodes)gameCode, 
-                fFile, 
-                wFile, 
-                tPath, 
-                bckup != 0
+                game,
+                fFile,
+                wFile,
+                tPath,
+                shouldBackup
             );
-            return 0;
+            NativeLogger.Info($"Repack for {tPath} completed successfully!");
+            return Exports.SuccessReturn;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[WBT Native Error]: {ex.Message}");
-            return 1;
+            NativeLogger.Error($"Repack Failed with error: {ex.Message}");
+            return Exports.ExceptionError;
         }
     }
 
     [UnmanagedCallersOnly(EntryPoint = "repack_multiple", CallConvs = [typeof(CallConvCdecl)])]
-    public static int RepackMultiple(int gameCode, IntPtr filelistFile, IntPtr whiteBinFile, IntPtr whiteExtractedDir, byte bckup)
+    public static int RepackMultiple(int gameCode, IntPtr fileListPtr, IntPtr whiteBinPtr, IntPtr extractedDirPtr,
+        byte backup)
     {
         try
         {
-            var fFile = PtrToString(filelistFile);
-            var wFile = PtrToString(whiteBinFile);
-            var eDir = PtrToString(whiteExtractedDir);
+            var fFile = PtrToString(fileListPtr);
+            var wFile = PtrToString(whiteBinPtr);
+            var eDir = PtrToString(extractedDirPtr);
+            var game = (LibaryEnums.GameCodes)gameCode;
+            var shouldBackup = backup != 0;
 
-            if (string.IsNullOrEmpty(fFile) || string.IsNullOrEmpty(wFile) || string.IsNullOrEmpty(eDir)) 
-                return -1;
+            if (string.IsNullOrEmpty(fFile) || string.IsNullOrEmpty(wFile) || string.IsNullOrEmpty(eDir))
+            {
+                NativeLogger.Error($"Invalid arguments! Either fileListPtr, whiteBinPtr or extractedDirPtr are null." +
+                                   $"\nfileListPtr: {fFile},  whiteBinPtr: {wFile}, extractedDirPtr: {eDir}");
+                return Exports.InvalidArgsError;
+            }
 
+            NativeLogger.Debug($"Repacking multiple files : {eDir} for game: {game}, backup: {shouldBackup}");
             RepackActions.RepackMultiple(
-                (LibaryEnums.GameCodes)gameCode, 
-                fFile, 
-                wFile, 
-                eDir, 
-                bckup != 0
+                game,
+                fFile,
+                wFile,
+                eDir,
+                shouldBackup
             );
-            return 0;
+            NativeLogger.Info($"Repack for {eDir} completed successfully!");
+            return Exports.SuccessReturn;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[WBT Native Error]: {ex.Message}");
-            return 1;
+            NativeLogger.Error($"Repack Failed with error: {ex.Message}");
+            return Exports.ExceptionError;
         }
     }
 
     [UnmanagedCallersOnly(EntryPoint = "repack_filelist_from_chunks", CallConvs = [typeof(CallConvCdecl)])]
-    public static int RepackFilelistFromChunks(int gameCode, IntPtr extractedFilelistDir, byte bckup)
+    public static int RepackFileListFromChunks(int gameCode, IntPtr extractedFilelistDir, byte backup)
     {
         try
         {
             var eDir = PtrToString(extractedFilelistDir);
-
-            if (string.IsNullOrEmpty(eDir)) 
-                return -1;
-
+            var shouldBackup = backup != 0;
+            var game = (LibaryEnums.GameCodes)gameCode;
+            if (string.IsNullOrEmpty(eDir))
+            {
+                NativeLogger.Error("Invalid Arguments! extractedFilelistDir is null or empty." +
+                                   $"\neDir: {eDir}");
+                return Exports.InvalidArgsError;
+            }
+            
+            NativeLogger.Debug($"Repacking single file: {eDir} for game: {game}, backup: {shouldBackup}");
             RepackActions.RepackFilelistFromChunks(
-                (LibaryEnums.GameCodes)gameCode, 
-                eDir, 
-                bckup != 0
+                game,
+                eDir,
+                shouldBackup
             );
-            return 0;
+            NativeLogger.Info($"Repacked filelist: {eDir} successfully!");
+            return Exports.SuccessReturn;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[WBT Native Error]: {ex.Message}");
-            return 1;
+            NativeLogger.Error($"Repack Failed with error: {ex.Message}");
+            return Exports.ExceptionError;
         }
     }
 
     [UnmanagedCallersOnly(EntryPoint = "repack_filelist_from_json", CallConvs = [typeof(CallConvCdecl)])]
-    public static int RepackFilelistFromJson(int gameCode, IntPtr jsonFile, byte bckup)
+    public static int RepackFileListFromJson(int gameCode, IntPtr jsonFile, byte backup)
     {
         try
         {
             var jFile = PtrToString(jsonFile);
-
-            if (string.IsNullOrEmpty(jFile)) 
-                return -1;
-
+            var game =  (LibaryEnums.GameCodes)gameCode;
+            var shouldBackup = backup != 0;
+            if (string.IsNullOrEmpty(jFile))
+            {
+                NativeLogger.Error("Invalid Arguments! jsonFile is null or empty." +
+                                   $"\njsonFile: {jFile}");
+                return Exports.InvalidArgsError;
+            }
+            NativeLogger.Debug($"Repacking single file: {jFile} for game: {game}, backup: {shouldBackup}");
             RepackActions.RepackFilelistFromJson(
-                (LibaryEnums.GameCodes)gameCode, 
-                jFile, 
-                bckup != 0
+                game,
+                jFile,
+                shouldBackup
             );
-            return 0;
+            NativeLogger.Info($"Repacked filelist: {jFile} successfully!");
+            return Exports.SuccessReturn;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[WBT Native Error]: {ex.Message}");
-            return 1;
+            NativeLogger.Error($"Repack Failed with error: {ex.Message}");
+            return Exports.ExceptionError;
         }
     }
 }

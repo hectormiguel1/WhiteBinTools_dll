@@ -1,10 +1,12 @@
-﻿namespace WhiteBinTools.Support;
+﻿using WhiteBinTools.Native;
+
+namespace WhiteBinTools.Support;
 
 internal static class CommonMethods
 {
     public static void ErrorExit(string errorMsg)
     {
-        Console.WriteLine(errorMsg);
+        NativeLogger.Error(errorMsg);
         throw new Exception(errorMsg);
     }
 

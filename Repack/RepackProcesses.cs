@@ -8,7 +8,7 @@ namespace WhiteBinTools.Repack;
 
 internal static class RepackProcesses
 {
-    private static readonly string _pathSeparatorChar = Convert.ToString(Path.DirectorySeparatorChar);
+    private static readonly string PathSeparatorChar = Convert.ToString(Path.DirectorySeparatorChar);
 
     public static void PrepareRepackVars(RepackVariables repackVariables, string filelistFile, FilelistVariables filelistVariables, string extractedDir)
     {
@@ -51,7 +51,7 @@ internal static class RepackProcesses
         repackVariables.OgFilePos = Convert.ToUInt32(repackVariables.ConvertedOgStringData[0], 16) * 2048;
         repackVariables.OgUnCmpSize = Convert.ToUInt32(repackVariables.ConvertedOgStringData[1], 16);
         repackVariables.OgCmpSize = Convert.ToUInt32(repackVariables.ConvertedOgStringData[2], 16);
-        repackVariables.OgMainPath = repackVariables.ConvertedOgStringData[3].Replace("/", _pathSeparatorChar);
+        repackVariables.OgMainPath = repackVariables.ConvertedOgStringData[3].Replace("/", PathSeparatorChar);
 
         if (repackVariables.OgMainPath == " ")
         {
@@ -66,7 +66,7 @@ internal static class RepackProcesses
             repackVariables.OgDirectoryPath = Path.GetDirectoryName(repackVariables.OgMainPath) ?? string.Empty;
             repackVariables.OgFileName = Path.GetFileName(repackVariables.OgMainPath);
             repackVariables.OgFullFilePath = Path.Combine(extractedDir, repackVariables.OgDirectoryPath, repackVariables.OgFileName);
-            repackVariables.RepackPathInChunk = repackVariables.OgMainPath.Replace(_pathSeparatorChar, "/");
+            repackVariables.RepackPathInChunk = repackVariables.OgMainPath.Replace(PathSeparatorChar, "/");
         }
 
         if (repackVariables.OgUnCmpSize != repackVariables.OgCmpSize)
@@ -184,7 +184,7 @@ internal static class RepackProcesses
 
         var stringData = stringBuilder.ToString();
 
-        if (gameCode == GameCodes.ff132)
+        if (gameCode == GameCodes.Ff132)
         {
             newChunksDict[filelistVariables.CurrentChunkNumber].AddRange(Encoding.UTF8.GetBytes(stringData));
             filelistVariables.LastChunkNumber = filelistVariables.CurrentChunkNumber;

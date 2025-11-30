@@ -1,4 +1,6 @@
-﻿using WhiteBinTools.Crypto;
+﻿using System.Runtime.Serialization;
+using WhiteBinTools.Crypto;
+using WhiteBinTools.Native;
 using WhiteBinTools.Repack;
 using WhiteBinTools.Support;
 using WhiteBinTools.Support.Extensions;
@@ -14,21 +16,21 @@ internal static class FilelistCrypto
         {
             // Check for encryption header in the filelist file,
             // if the game code is set to ff13-1
-            case GameCodes.ff131:
+            case GameCodes.Ff131:
             {
                 filelistVariables.IsEncrypted = CheckIfEncrypted(filelistVariables.MainFilelistFile);
 
                 if (filelistVariables.IsEncrypted)
                 {
-                    Console.WriteLine("Error: Detected encrypted filelist file. set the game code to 'ff132' for handling this type of filelist");
-                    CommonMethods.ErrorExit("");
+                    NativeLogger.Error("Error: Detected encrypted filelist file. set the game code to 'ff132' for handling this type of filelist");
+                    throw new ArgumentException("Encrypted filelist with FF13-1 Game mode set!");
                 }
 
                 break;
             }
             // Check for encryption header in the filelist file,
             // if the game code is set to ff13-2
-            case GameCodes.ff132:
+            case GameCodes.Ff132:
                 filelistVariables.IsEncrypted = CheckIfEncrypted(filelistVariables.MainFilelistFile);
                 break;
         }
@@ -52,8 +54,8 @@ internal static class FilelistCrypto
 
             if (cryptBodySize % 8 != 0)
             {
-                Console.WriteLine("Error: Length of the body to decrypt/encrypt is not valid");
-                CommonMethods.ErrorExit("");
+                NativeLogger.Error("Length of the body to decrypt/encrypt is not valid");
+                throw new InvalidDataContractException("Length of the body to decrypt/encrypt is not valid");
             }
 
             encCheckReader.BaseStream.Position = 32 + cryptBodySize - 8;
@@ -78,8 +80,8 @@ internal static class FilelistCrypto
                 CommonMethods.IfFileExistsDel(filelistVariables.TmpDcryptFilelistFile);
                 File.Copy(filelistVariables.MainFilelistFile, filelistVariables.TmpDcryptFilelistFile);
 
-                Console.WriteLine("\nDecrypting filelist file....");
-                CryptFilelist.ProcessFilelist(CryptActions.d, filelistVariables.TmpDcryptFilelistFile);
+                NativeLogger.Debug("Decrypting the filelist...");
+                CryptFilelist.ProcessFilelist(CryptActions.D, filelistVariables.TmpDcryptFilelistFile);
 
                 using (var decFilelistReader = new BinaryReader(File.Open(filelistVariables.TmpDcryptFilelistFile, FileMode.Open, FileAccess.Read), GlobalConfig.DefaultEncoding))
                 {
@@ -92,16 +94,12 @@ internal static class FilelistCrypto
 
                     if (filelistHash != decFilelistReader.ComputeCheckSum(filelistDataSize / 4, 32))
                     {
-                        decFilelistReader.Dispose();
-
-                        const string errorMsg = "Error: Filelist was not decrypted correctly";
-
-                        Console.WriteLine(errorMsg);
-                        CommonMethods.ErrorExit(errorMsg);
+                        NativeLogger.Error("Filelist was not decrypted correctly");
+                        throw new InvalidDataContractException("Failed to decrypt the filelist");
                     }
                 }
 
-                Console.WriteLine("Finished decrypting filelist file\n");
+                NativeLogger.Info("Finished decrypting filelist file");
 
                 filelistVariables.MainFilelistFile = filelistVariables.TmpDcryptFilelistFile;
                 break;
@@ -181,7 +179,7 @@ internal static class FilelistCrypto
         }
 
         // Encrypt the filelist file
-        CryptFilelist.ProcessFilelist(CryptActions.e, repackVariables.NewFilelistFile);
-        Console.WriteLine("\nFinished encrypting new filelist");
+        CryptFilelist.ProcessFilelist(CryptActions.E, repackVariables.NewFilelistFile);
+        NativeLogger.Info("Finished encrypting new filelist");
     }
 }

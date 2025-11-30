@@ -1,4 +1,5 @@
 ﻿using WhiteBinTools.Filelist;
+using WhiteBinTools.Native;
 using WhiteBinTools.Support;
 using WhiteBinTools.Support.Extensions;
 using static WhiteBinTools.Support.LibaryEnums;
@@ -7,7 +8,7 @@ namespace WhiteBinTools.Unpack;
 
 internal static class UnpackProcesses
 {
-    private static readonly string _pathSeparatorChar = Convert.ToString(Path.DirectorySeparatorChar);
+    private static readonly string PathSeparatorChar = Convert.ToString(Path.DirectorySeparatorChar);
 
     // ---------------------------------------------------------
     // NEW: Shared Initialization Logic
@@ -27,7 +28,7 @@ internal static class UnpackProcesses
             }
         }
 
-        if (gameCode == GameCodes.ff132)
+        if (gameCode == GameCodes.Ff132)
         {
             vars.CurrentChunkNumber = -1;
         }
@@ -69,11 +70,11 @@ internal static class UnpackProcesses
     // ---------------------------------------------------------
     // NEW: Shared Extraction Logic (Replaces Logic in A, B, C)
     // ---------------------------------------------------------
-    public static void ExtractFiles(GameCodes gameCode, string filelistFile, string whiteBinFile, Func<FilelistVariables, bool>? shouldExtractPredicate)
+    public static void ExtractFiles(GameCodes gameCode, string filelistFile, string whiteBinFile, Func<FilelistVariables, bool>? shouldExtractPredicate, string? whiteExtractedDir = null)
     {
         var vars = InitializeFilelist(gameCode, filelistFile);
         var unpackVars = new UnpackVariables();
-        PrepareBinVars(whiteBinFile, unpackVars);
+        PrepareBinVars(whiteBinFile, unpackVars, whiteExtractedDir);
 
         // Clean/Create Directory
         // Type A deletes existing, B/C just creates. 
@@ -112,34 +113,34 @@ internal static class UnpackProcesses
                 UnpackFile(vars, whiteBinStream, unpackVars);
                 hasExtracted = true;
 
-                Console.WriteLine($"{unpackVars.UnpackedState} _{Path.Combine(unpackVars.ExtractDirName, vars.MainPath)}");
+                NativeLogger.Debug($"{unpackVars.UnpackedState} _{Path.Combine(unpackVars.ExtractDirName, vars.MainPath)}");
             });
         }
 
         if (hasExtracted)
         {
-            Console.WriteLine($"\nFinished unpacking \"{unpackVars.WhiteBinName}\"");
+            NativeLogger.Debug($"Finished unpacking \"{unpackVars.WhiteBinName}\"");
             if (unpackVars.CountDuplicates > 0)
             {
-                Console.WriteLine($"{unpackVars.CountDuplicates} duplicate file(s)");
+                NativeLogger.Warn($"{unpackVars.CountDuplicates} duplicate file(s)");
             }
         }
         else
         {
-            Console.WriteLine("Specified file/directory does not exist or nothing was extracted.");
+            NativeLogger.Warn("Specified file/directory does not exist or nothing was extracted.");
         }
     }
 
     // ---------------------------------------------------------
     // Existing Helpers
     // ---------------------------------------------------------
-    public static void PrepareBinVars(string whiteBinFile, UnpackVariables unpackVariables)
+    public static void PrepareBinVars(string whiteBinFile, UnpackVariables unpackVariables, string? extractDir = null)
     {
         unpackVariables.WhiteBinName = Path.GetFileName(whiteBinFile);
         var inBinFilePath = Path.GetFullPath(whiteBinFile);
         unpackVariables.InBinFileDir = Path.GetDirectoryName(inBinFilePath) ?? string.Empty;
         unpackVariables.ExtractDirName = Path.GetFileName(whiteBinFile);
-        unpackVariables.ExtractDir = Path.Combine(unpackVariables.InBinFileDir, "_" + unpackVariables.ExtractDirName);
+        unpackVariables.ExtractDir = Path.Combine( extractDir ?? unpackVariables.InBinFileDir, "_" + unpackVariables.ExtractDirName);
     }
 
     public static void PrepareExtraction(string convertedString, FilelistVariables filelistVariables, string extractDir)
@@ -148,7 +149,7 @@ internal static class UnpackProcesses
         filelistVariables.Position = Convert.ToUInt32(filelistVariables.ConvertedStringData[0], 16) * 2048;
         filelistVariables.UnCmpSize = Convert.ToUInt32(filelistVariables.ConvertedStringData[1], 16);
         filelistVariables.CmpSize = Convert.ToUInt32(filelistVariables.ConvertedStringData[2], 16);
-        filelistVariables.MainPath = filelistVariables.ConvertedStringData[3].Replace("/", _pathSeparatorChar);
+        filelistVariables.MainPath = filelistVariables.ConvertedStringData[3].Replace("/", PathSeparatorChar);
         filelistVariables.IsCompressed = false;
 
         if (filelistVariables.MainPath == " ")

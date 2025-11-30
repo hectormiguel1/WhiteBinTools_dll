@@ -1,5 +1,6 @@
 using System.Text;
 using WhiteBinTools.Filelist;
+using WhiteBinTools.Native;
 using WhiteBinTools.Support;
 using WhiteBinTools.Support.Extensions;
 using static WhiteBinTools.Support.LibaryEnums;
@@ -42,7 +43,7 @@ public static class Repacker
         DecryptAndPrepareChunks(gameCode, filelistVariables, filelistFile);
 
         // 3. Prepare Chunk Container
-        if (gameCode == GameCodes.ff132) filelistVariables.CurrentChunkNumber = -1;
+        if (gameCode == GameCodes.Ff132) filelistVariables.CurrentChunkNumber = -1;
         
         var newChunksDict = new Dictionary<int, List<byte>>();
         RepackProcesses.CreateEmptyNewChunksDict(filelistVariables, newChunksDict);
@@ -51,7 +52,7 @@ public static class Repacker
         coreLogic(filelistVariables, repackVariables, newChunksDict);
 
         // 5. Finalize: Build new Filelist and Encrypt
-        Console.WriteLine("\nBuilding filelist....");
+        NativeLogger.Debug("Building filelist....");
         RepackFilelistData.BuildFilelist(filelistVariables, newChunksDict, repackVariables, gameCode);
 
         if (filelistVariables.IsEncrypted)
@@ -71,9 +72,9 @@ public static class Repacker
         bool bckup,
         Action<RepackVariables, Dictionary<int, List<byte>>> coreLogic)
     {
-        Console.WriteLine("TotalChunks: " + filelistVariables.TotalChunks);
-        Console.WriteLine("No of files: " + filelistVariables.TotalFiles + "\n");
-        Console.WriteLine("\n\nBuilding filelist....");
+        NativeLogger.Debug("TotalChunks: " + filelistVariables.TotalChunks);
+        NativeLogger.Debug("No of files: " + filelistVariables.TotalFiles + "\n");
+        NativeLogger.Debug("Building filelist....");
 
         var repackVariables = new RepackVariables
         {
@@ -172,7 +173,7 @@ public static class Repacker
     public static List<int> GetOddChunkValues(GameCodes code, uint totalChunks)
     {
         var list = new List<int>();
-        if (code != GameCodes.ff132 || totalChunks <= 1) return list;
+        if (code != GameCodes.Ff132 || totalChunks <= 1) return list;
         var next = 1;
         for (var i = 0; i < totalChunks; i++)
         {
@@ -239,7 +240,7 @@ public static class Repacker
     {
         var vars = new FilelistVariables();
         // Logic adapted directly from RepackTypeD.cs switch statement
-        if (code == GameCodes.ff131)
+        if (code == GameCodes.Ff131)
         {
             if (lines.Length < 2) CommonMethods.ErrorExit("#info.txt invalid.");
             vars.TotalFiles = ParseInfoLine(lines[0], "fileCount: ", ValueTypes.Uint, (s) => uint.Parse(s));
@@ -277,7 +278,7 @@ public static class Repacker
         writer.BaseStream.Position = pos;
         writer.WriteBytesUInt32(vars.FileCode, false);
 
-        if (code == GameCodes.ff131)
+        if (code == GameCodes.Ff131)
         {
             if (data.Length < 2) CommonMethods.ErrorExit($"Line {lineIdx} in Chunk_{chunkId} invalid.");
             writer.BaseStream.Position = pos + 4;
@@ -290,7 +291,7 @@ public static class Repacker
         {
             if (data.Length < 3) CommonMethods.ErrorExit($"Line {lineIdx} in Chunk_{chunkId} invalid.");
             CheckChunkEntryData(data[1], ValueTypes.Byte, chunkId, lineIdx);
-            vars.FileTypeID = byte.Parse(data[1]);
+            vars.FileTypeId = byte.Parse(data[1]);
 
             writer.BaseStream.Position = pos + 4;
             // Write 32768 position value if odd chunk
@@ -307,7 +308,7 @@ public static class Repacker
             writer.BaseStream.Position = pos + 6;
             writer.Write((byte)oddCtr);
             writer.BaseStream.Position = pos + 7;
-            writer.Write(vars.FileTypeID);
+            writer.Write(vars.FileTypeId);
             vars.PathString = data[2];
         }
     }
@@ -319,7 +320,7 @@ public static class Repacker
     internal static void ParseJsonHeaders(StreamReader reader, GameCodes code, FilelistVariables vars)
     {
         //
-        if (code == GameCodes.ff132)
+        if (code == GameCodes.Ff132)
         {
             vars.IsEncrypted = bool.Parse(CheckGetMainProperty(reader, "\"encrypted\"", ValueTypes.Boolean));
             if (vars.IsEncrypted)
@@ -345,7 +346,7 @@ public static class Repacker
         writer.WriteBytesUInt32(vars.FileCode, false);
 
         // 2. Metadata (Type/ChunkID)
-        if (code == GameCodes.ff131)
+        if (code == GameCodes.Ff131)
         {
             writer.BaseStream.Position = pos + 4;
             writer.WriteBytesUInt16((ushort)chunkId, false);
@@ -356,7 +357,7 @@ public static class Repacker
         {
             line = reader.ReadLine()?.Trim();
             val = CheckGetChunkEntryProperty(line!, "\"fileTypeID\"", chunkId, ValueTypes.Byte);
-            vars.FileTypeID = byte.Parse(val);
+            vars.FileTypeId = byte.Parse(val);
 
             writer.BaseStream.Position = pos + 4;
             if (oddChunks.Contains(chunkId))
@@ -371,7 +372,7 @@ public static class Repacker
             writer.BaseStream.Position = pos + 6;
             writer.Write((byte)oddCtr);
             writer.BaseStream.Position = pos + 7;
-            writer.Write(vars.FileTypeID);
+            writer.Write(vars.FileTypeId);
         }
 
         // 3. FilePath
