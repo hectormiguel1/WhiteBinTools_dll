@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using WhiteBinTools.Support;
 using WhiteBinTools.Unpack;
@@ -9,7 +10,7 @@ public static class Unpack
      // ---------------------------------------------------------
     // 1. Metadata Binding
     // ---------------------------------------------------------
-    [UnmanagedCallersOnly(EntryPoint = "get_file_metadata")]
+    [UnmanagedCallersOnly(EntryPoint = "get_file_metadata", CallConvs = [typeof(CallConvCdecl)])]
     public static unsafe NativeStructs.FileEntryList GetFileMetadata(int gameCodeRaw, byte* filesPtr)
     {
         try
@@ -55,7 +56,7 @@ public static class Unpack
     // 2. Action Bindings
     // ---------------------------------------------------------
 
-    [UnmanagedCallersOnly(EntryPoint = "unpack_all")]
+    [UnmanagedCallersOnly(EntryPoint = "unpack_all", CallConvs = [typeof(CallConvCdecl)])]
     public static unsafe int UnpackAll(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr)
     {
         try 
@@ -80,7 +81,7 @@ public static class Unpack
             return Exports.ExceptionError; // Fail
         }
     }
-    [UnmanagedCallersOnly(EntryPoint = "unpack_all_to_path")]
+    [UnmanagedCallersOnly(EntryPoint = "unpack_all_to_path" , CallConvs = [typeof(CallConvCdecl)])]
     public static unsafe int UnpackAllToPath(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr, byte* outDirPtr)
     {
         try 
@@ -115,7 +116,7 @@ public static class Unpack
         }
     }
 
-    [UnmanagedCallersOnly(EntryPoint = "unpack_single")]
+    [UnmanagedCallersOnly(EntryPoint = "unpack_single" , CallConvs = [typeof(CallConvCdecl)])]
     public static unsafe int UnpackSingle(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr, byte* targetPathPtr)
     {
         try
@@ -143,7 +144,7 @@ public static class Unpack
             return Exports.ExceptionError; 
         }
     }
-    [UnmanagedCallersOnly(EntryPoint = "unpack_single_to_path")]
+    [UnmanagedCallersOnly(EntryPoint = "unpack_single_to_path" , CallConvs = [typeof(CallConvCdecl)])]
     public static unsafe int UnpackSingleToPath(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr, byte* targetPathPtr, byte* outDirPtr)
     {
         try
@@ -183,7 +184,7 @@ public static class Unpack
     }
     
     
-    [UnmanagedCallersOnly(EntryPoint = "unpack_multiple")]
+    [UnmanagedCallersOnly(EntryPoint = "unpack_multiple", CallConvs = [typeof(CallConvCdecl)])]
     public static unsafe int UnpackMultiple(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr, byte* directoryPtr)
     {
         try
@@ -230,7 +231,7 @@ public static class Unpack
         }
     }
 
-    [UnmanagedCallersOnly(EntryPoint = "unpack_multiple_to_path")]
+    [UnmanagedCallersOnly(EntryPoint = "unpack_multiple_to_path" , CallConvs = [typeof(CallConvCdecl)])]
     public static unsafe int UnpackMultipleToPath(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr, byte* directoryPtr, byte* outDirPtr)
     {
         try
@@ -287,7 +288,7 @@ public static class Unpack
     // 3. Memory Management Helpers
     // ---------------------------------------------------------
 
-    [UnmanagedCallersOnly(EntryPoint = "free_metadata")]
+    [UnmanagedCallersOnly(EntryPoint = "free_metadata" , CallConvs = [typeof(CallConvCdecl)])]
     public static void FreeMetadata(NativeStructs.FileEntryList list)
     {
         NativeLogger.Debug($"Cleaning up memory for {list.Items} item(s)...");
