@@ -32,6 +32,15 @@ extern "C" {
         FF132 = 1
     } GameCode;
     
+    typedef enum
+    {
+        FILE_NOT_FOUND = -2,
+        INVLID_ARGS = -1,
+        SUCCESS = 0, 
+        EXCEPTION_ERROR = 1,
+        
+    } WBT_STATUS;
+    
     /* =======================================================================
  * Struct Definitions (Must match NativeStructs.cs layout)
  * ======================================================================= */
@@ -47,14 +56,6 @@ extern "C" {
         FileEntry* items;     // Array pointer
         unsigned int count;
     } FileEntryList;
-
-    /* =======================================================================
-     * Error Codes
-     * ======================================================================= */
-#define WBT_SUCCESS 0
-#define WBT_ERROR_GENERAL 1
-#define WBT_ERROR_INVALID_ARGS -1
-#define WBT_ERROR_FILE_NOT_FOUND 2
 
 #ifdef __cplusplus
 }

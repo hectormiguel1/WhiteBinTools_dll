@@ -28,13 +28,16 @@ extern "C" {
     /**
      * @brief Extracts all files found in the filelist.
      */
-    WBT_API int unpack_all(
+    WBT_API WBT_STATUS unpack_all(
         GameCode gameCodeRaw, 
         const char* filelist_path, 
         const char* white_bin_path
     );
     
-    WBT_API int unpack_all_to_path(
+    /**
+ * @brief Extracts all files found in the filelist. to specified outDir
+ */
+    WBT_API WBT_STATUS unpack_all_to_path(
         GameCode gameCodeRaw, 
         const char* filelist_path,
         const char* white_bin_path,
@@ -44,21 +47,43 @@ extern "C" {
     /**
      * @brief Extracts a single file based on exact internal path matching.
      */
-    WBT_API int unpack_single(
+    WBT_API WBT_STATUS unpack_single(
         GameCode gameCodeRaw, 
         const char* filelist_path, 
         const char* white_bin_path, 
         const char* target_path
     );
+    
+    /**
+ * @brief Extracts a single file based on exact internal path matching to specified outDir
+ */
+    WBT_API WBT_STATUS unpack_single_to_path(
+        GameCode gameCodeRaw, 
+        const char* filelist_path, 
+        const char* white_bin_path, 
+        const char* target_path,
+        const char* outDir
+    );
 
     /**
      * @brief Extracts multiple files matching a directory pattern.
      */
-    WBT_API int unpack_multiple(
+    WBT_API WBT_STATUS unpack_multiple(
         GameCode gameCodeRaw, 
         const char* filelist_path, 
         const char* white_bin_path, 
         const char* directory_filter
+    );
+    
+    /**
+ * @brief Extracts multiple files matching a directory pattern. to specified outDir
+ */
+    WBT_API WBT_STATUS unpack_multiple_to_path(
+        GameCode gameCodeRaw, 
+        const char* filelist_path, 
+        const char* white_bin_path, 
+        const char* directory_filter, 
+        const char* outDir
     );
 
 #ifdef __cplusplus
