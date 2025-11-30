@@ -33,4 +33,46 @@ public static class Exports
 
         return new NativeStructs.FileEntryList { Items = ptr, Count = list.Count };
     }
+    
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void LoggerCallback(IntPtr msgPtr);
+
+
+    /// <summary>
+    /// Registers a callback function for logging.
+    /// C Signature: void set_logging_callback(void (*callback)(const char*));
+    /// </summary>
+    [UnmanagedCallersOnly(EntryPoint = "set_logging_callback", CallConvs = [typeof(CallConvCdecl)])]
+    public static void SetLoggingCallback(IntPtr callbackPtr)
+    {
+        if (callbackPtr == IntPtr.Zero)
+        {
+            NativeLogger.LoggingCallback = Console.WriteLine;
+            return;
+        }
+
+        var nativeCallback = Marshal.GetDelegateForFunctionPointer<LoggerCallback>(callbackPtr);
+
+        NativeLogger.LoggingCallback = (msg) =>
+        {
+            // ALLOCATE: Create a UTF-8 copy on the Heap (Unmanaged Memory).
+            // This memory persists until explicitly freed.
+            var ptr = Marshal.StringToCoTaskMemUTF8(msg);
+
+            // CALL: Pass the pointer to Dart. 
+            // Since it's heap memory, it's safe even if Dart processes it asynchronously.
+            nativeCallback(ptr);
+        };
+    }
+    
+    // 3. The Cleanup Function (CRITICAL NEW EXPORT)
+    // Dart must call this after it reads the string.
+    [UnmanagedCallersOnly(EntryPoint = "free_log_memory", CallConvs = [typeof(CallConvCdecl)])]
+    public static void FreeLogMemory(IntPtr ptr)
+    {
+        if (ptr != IntPtr.Zero)
+        {
+            Marshal.FreeCoTaskMem(ptr);
+        }
+    }
 }

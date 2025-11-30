@@ -13,6 +13,10 @@ public enum LogType
 internal static class NativeLogger
 {
     private const string LogFormat = "[WBT NATIVE] [{0}] {1} {2}: {3}";
+    internal static Action<string>? LoggingCallback {
+        get;
+        set;
+    } = Console.WriteLine;
 
     private static void Log(string message, LogType type = LogType.Info, 
         [CallerFilePath] string filePath = "", 
@@ -34,21 +38,7 @@ internal static class NativeLogger
 
         // 3. Build the string
         var finalLog = string.Format(LogFormat, className, typeTag, memberName, message);
-
-        // 4. Output with Color (Optional visual aid)
-        var originalColor = Console.ForegroundColor;
-        Console.ForegroundColor = type switch
-        {
-            LogType.Error => ConsoleColor.Red,
-            LogType.Warning => ConsoleColor.Yellow,
-            LogType.Debug => ConsoleColor.DarkGray,
-            _ => ConsoleColor.White
-        };
-
-        Console.WriteLine(finalLog);
-        
-        // Reset color
-        Console.ForegroundColor = originalColor;
+        LoggingCallback?.Invoke(finalLog);
     }
 
     // Shorthand helpers

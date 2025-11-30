@@ -25,7 +25,16 @@ extern "C" {
     // Represents a boolean value (0 = false, 1 = true).
     // Using uint8_t ensures 1-byte alignment to match C# 'byte'.
     typedef unsigned char WBT_BOOL;
+    // --- Logging ---
+    // Callback receives a pointer to a UTF-8 string allocated on the heap.
+    typedef void (*LogCallback)(const char* message);
 
+    // Register logging callback. Pass NULL to reset to default console output.
+    WBT_API void set_logging_callback(LogCallback callback);
+
+    // [NEW] Free the memory allocated for the log message.
+    // Must be called by the consumer (Dart/C) after processing the log string.
+    WBT_API void free_log_memory(void* ptr);
     // Game Identifier Enum
     typedef enum {
         FF131 = 0,
@@ -56,6 +65,9 @@ extern "C" {
         FileEntry* items;     // Array pointer
         unsigned int count;
     } FileEntryList;
+    
+    //Register a call back to be invoked when logging messages.
+    void set_logging_callback(void (*callback)(const char*));
 
 #ifdef __cplusplus
 }
