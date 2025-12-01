@@ -10,45 +10,54 @@ public enum LogType
     Debug
 }
 
-internal static class NativeLogger
+public static class NativeLogger
 {
-    private const string LogFormat = "[WBT NATIVE] [{0}] {1} {2}: {3}";
-    internal static Action<string>? LoggingCallback {
-        get;
-        set;
-    } = Console.WriteLine;
+    // Updated Format:
+    // {0} = Timestamp
+    // {1} = Type Tag (Fixed Width)
+    // {2} = Class Name (Padded Left -15 chars)
+    // {3} = Line number (Padded to 4 chars)
+    // {4} = Message
+    private const string LogFormat = "{0} [WBT NATIVE] {1}\t{2}: {3}";
 
-    private static void Log(string message, LogType type = LogType.Info, 
-        [CallerFilePath] string filePath = "", 
-        [CallerMemberName] string memberName = "")
+    internal static Action<string>? LoggingCallback { get; set; } = Console.WriteLine;
+
+    private static void Log(string message, LogType type = LogType.Info,
+        [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
     {
-        // 1. Extract Class Name from File Path (AOT-friendly way to get context)
-        // e.g., "C:\Projects\Repack.cs" becomes "Repack"
+        // 1. Get Timestamp
+        var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
+
+        // 2. Extract Class Name
         var className = Path.GetFileNameWithoutExtension(filePath);
 
-        // 2. Format the Type Tag
+        // 3. Format the Type Tag (Normalized to same length for alignment)
         var typeTag = type switch
         {
             LogType.Info    => "[INFO]",
             LogType.Warning => "[WARN]",
-            LogType.Error   => "[ERR]",
-            LogType.Debug   => "[DBG]",
-            _               => "[INF]"
+            LogType.Error   => "[ERR ]",
+            LogType.Debug   => "[DEBG]",
+            _               => "[INFO]"
         };
 
-        // 3. Build the string
-        var finalLog = string.Format(LogFormat, className, typeTag, memberName, message);
+        // 4. Build the string
+        // Note: The padding is handled by the {index, alignment} syntax in LogFormat
+        var finalLog = string.Format(LogFormat, timestamp, typeTag, $"{className}@{lineNumber}", message);
+        
         LoggingCallback?.Invoke(finalLog);
     }
 
-    // Shorthand helpers
-    public static void Info(string msg, [CallerFilePath] string f = "", [CallerMemberName] string m = "") 
-        => Log(msg, LogType.Info, f, m);
+    // Shorthand helpers remain the same
+    public static void Info(string msg, [CallerFilePath] string f = "", [CallerLineNumber] int lineNumber = 0) 
+        => Log(msg, LogType.Info, f, lineNumber);
         
-    public static void Error(string msg, [CallerFilePath] string f = "", [CallerMemberName] string m = "") 
-        => Log(msg, LogType.Error, f, m);
+    public static void Error(string msg, [CallerFilePath] string f = "", [CallerLineNumber] int lineNumber = 0) 
+        => Log(msg, LogType.Error, f, lineNumber);
         
-    public static void Warn(string msg, [CallerFilePath] string f = "", [CallerMemberName] string m = "") 
-        => Log(msg, LogType.Warning, f, m);
-    public static void Debug(string msg, [CallerFilePath] string f = "", [CallerMemberName] string m = "") => Log(msg, LogType.Debug, f, m);
+    public static void Warn(string msg, [CallerFilePath] string f = "", [CallerLineNumber] int lineNumber = 0) 
+        => Log(msg, LogType.Warning, f, lineNumber);
+        
+    public static void Debug(string msg, [CallerFilePath] string f = "", [CallerLineNumber] int lineNumber = 0) 
+        => Log(msg, LogType.Debug, f, lineNumber);
 }

@@ -157,7 +157,7 @@ public static class Repacker
                 {
                     filelistStream.Seek(0, SeekOrigin.Begin);
                     vars.EncryptedHeaderData = new byte[32];
-                    filelistStream.Read(vars.EncryptedHeaderData, 0, 32);
+                    filelistStream.ReadExactly(vars.EncryptedHeaderData, 0, 32);
 
                     filelistStream.Dispose();
                     File.Delete(vars.MainFilelistFile);

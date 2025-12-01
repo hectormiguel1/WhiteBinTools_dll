@@ -65,9 +65,6 @@ extern "C" {
         FileEntry* items;     // Array pointer
         unsigned int count;
     } FileEntryList;
-    
-    //Register a call back to be invoked when logging messages.
-    void set_logging_callback(void (*callback)(const char*));
 
 #ifdef __cplusplus
 }
