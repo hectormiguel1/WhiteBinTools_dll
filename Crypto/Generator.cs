@@ -31,11 +31,9 @@ internal static class Generator
 
         Array.ConstrainedCopy(xorBlock, 0, xorTable, 0, xorBlock.Length);
 
-        if (logDisplay)
-        {
-            Console.WriteLine($"Block 0: {xorBlock[0]:X2} {xorBlock[1]:X2} {xorBlock[2]:X2} {xorBlock[3]:X2} " +
-                              $"{xorBlock[4]:X2} {xorBlock[5]:X2} {xorBlock[6]:X2} {xorBlock[7]:X2}");
-        }
+
+        Log.Debug($"Block 0: {xorBlock[0]:X2} {xorBlock[1]:X2} {xorBlock[2]:X2} {xorBlock[3]:X2} " +
+                  $"{xorBlock[4]:X2} {xorBlock[5]:X2} {xorBlock[6]:X2} {xorBlock[7]:X2}");
 
 
         // Loop 2
@@ -64,11 +62,10 @@ internal static class Generator
 
             Array.ConstrainedCopy(xorBlock, 0, xorTable, copyIndex, xorBlock.Length);
 
-            if (logDisplay)
-            {
-                Console.WriteLine($"Block {i}: {xorBlock[0]:X2} {xorBlock[1]:X2} {xorBlock[2]:X2} {xorBlock[3]:X2} " +
-                                  $"{xorBlock[4]:X2} {xorBlock[5]:X2} {xorBlock[6]:X2} {xorBlock[7]:X2}");
-            }
+
+            Log.Debug($"Block {i}: {xorBlock[0]:X2} {xorBlock[1]:X2} {xorBlock[2]:X2} {xorBlock[3]:X2} " +
+                      $"{xorBlock[4]:X2} {xorBlock[5]:X2} {xorBlock[6]:X2} {xorBlock[7]:X2}");
+
 
             previousXorBlock = BitConverter.ToUInt64(xorBlock, 0);
 

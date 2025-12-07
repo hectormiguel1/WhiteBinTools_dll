@@ -6,7 +6,7 @@ internal static class CommonMethods
 {
     public static void ErrorExit(string errorMsg)
     {
-        NativeLogger.Error(errorMsg);
+        Log.Error(errorMsg);
         throw new Exception(errorMsg);
     }
 

@@ -361,3 +361,17 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/.idea/.idea.WhiteBinTools/.idea/.gitignore
+/.idea/.idea.WhiteBinTools/.idea/encodings.xml
+/.idea/.idea.WhiteBinTools/.idea/indexLayout.xml
+/.idea/.idea.WhiteBinTools/.idea/riderPublish.xml
+/.idea/.idea.WhiteBinTools/.idea/vcs.xml
+/.idea/.idea.WhiteBinTools.dir/.idea/.gitignore
+/.idea/.idea.WhiteBinTools.dir/.idea/encodings.xml
+/.idea/.idea.WhiteBinTools.dir/.idea/indexLayout.xml
+/.idea/.idea.WhiteBinTools.dir/.idea/vcs.xml
+/.idea/.idea.WhiteBinTools_dll/.idea/.gitignore
+/.idea/.idea.WhiteBinTools_dll/.idea/.name
+/.idea/.idea.WhiteBinTools_dll/.idea/encodings.xml
+/.idea/.idea.WhiteBinTools_dll/.idea/indexLayout.xml
+/.idea/.idea.WhiteBinTools_dll/.idea/vcs.xml

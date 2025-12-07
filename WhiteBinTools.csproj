@@ -9,11 +9,14 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <InvariantGlobalization>true</InvariantGlobalization>
         <TieredCompilation>false</TieredCompilation>
-        <RootNamespace>WhiteBinTools</RootNamespace></PropertyGroup>
+        <RootNamespace>WhiteBinTools</RootNamespace>
+    </PropertyGroup>
     
     <ItemGroup>
       <PackageReference Include="System.Text.Encoding.CodePages" Version="10.0.0" />
     </ItemGroup>
+    
+    <Import Project="..\NativeLogger\NativeLogger.projitems" Label="Shared" />
     
     <PropertyGroup Condition="'$(Configuration)'=='Release'">
         <PublishAot>true</PublishAot> 

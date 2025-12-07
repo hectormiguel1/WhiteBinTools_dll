@@ -37,8 +37,8 @@ internal static class FilelistChunksPrep
         filelistVariables.ChunkInfoSize = filelistVariables.ChunkDataSectionOffset - filelistVariables.ChunkInfoSectionOffset;
         filelistVariables.TotalChunks = filelistVariables.ChunkInfoSize / 12;
 
-        NativeLogger.Debug($"TotalChunks: {filelistVariables.TotalChunks}");
-        NativeLogger.Debug($"No of files: {filelistVariables.TotalFiles}");
+        Log.Debug($"TotalChunks: {filelistVariables.TotalChunks}");
+        Log.Debug($"No of files: {filelistVariables.TotalFiles}");
     }
 
 

@@ -2,7 +2,8 @@
 
 internal static class Encryption
 {
-    public static void EncryptBlocks(byte[] xorTable, uint blockCount, uint readPos, uint writePos, BinaryReader inFileReader, BinaryWriter encryptedStreamBinWriter, bool logDisplay)
+    public static void EncryptBlocks(byte[] xorTable, uint blockCount, uint readPos, uint writePos,
+        BinaryReader inFileReader, BinaryWriter encryptedStreamBinWriter, bool logDisplay)
     {
         uint blockCounter = 0;
 
@@ -15,9 +16,11 @@ internal static class Encryption
 
             inFileReader.BaseStream.Position = readPos;
             var bytesToEncrypt = inFileReader.ReadBytes(8);
-            byte[] bytesToEncryptLowerArray = [bytesToEncrypt[7], bytesToEncrypt[6], bytesToEncrypt[5], bytesToEncrypt[4]];
+            byte[] bytesToEncryptLowerArray =
+                [bytesToEncrypt[7], bytesToEncrypt[6], bytesToEncrypt[5], bytesToEncrypt[4]];
             byte[] bytesToEncryptHigherArray =
-            [bytesToEncrypt[3], bytesToEncrypt[2], bytesToEncrypt[1], bytesToEncrypt[0]
+            [
+                bytesToEncrypt[3], bytesToEncrypt[2], bytesToEncrypt[1], bytesToEncrypt[0]
             ];
 
             var bytesToEncryptLowerVal = bytesToEncryptLowerArray.ArrayToFfNum();
@@ -116,22 +119,20 @@ internal static class Encryption
             byte[] encryptedByteArray =
             [
                 (byte)encryptedByte1, (byte)encryptedByte2, (byte)encryptedByte3,
-                (byte)encryptedByte4, (byte)encryptedByte5, (byte)encryptedByte6, (byte)encryptedByte7, (byte)encryptedByte8
+                (byte)encryptedByte4, (byte)encryptedByte5, (byte)encryptedByte6, (byte)encryptedByte7,
+                (byte)encryptedByte8
             ];
 
             encryptedStreamBinWriter.BaseStream.Position = writePos;
             encryptedStreamBinWriter.Write(encryptedByteArray);
 
 
-            if (logDisplay)
-            {
-                Console.Write($"Block: {i}  ");
+            Log.Debug($"Block: {i}  ");
 
-                Console.WriteLine(encryptedByteArray[0].ToString("X2") + " " + encryptedByteArray[1].ToString("X2") + " " +
-                                  encryptedByteArray[2].ToString("X2") + " " + encryptedByteArray[3].ToString("X2") + " " +
-                                  encryptedByteArray[4].ToString("X2") + " " + encryptedByteArray[5].ToString("X2") + " " +
-                                  encryptedByteArray[6].ToString("X2") + " " + encryptedByteArray[7].ToString("X2"));
-            }
+            Log.Debug(encryptedByteArray[0].ToString("X2") + " " + encryptedByteArray[1].ToString("X2") + " " +
+                      encryptedByteArray[2].ToString("X2") + " " + encryptedByteArray[3].ToString("X2") + " " +
+                      encryptedByteArray[4].ToString("X2") + " " + encryptedByteArray[5].ToString("X2") + " " +
+                      encryptedByteArray[6].ToString("X2") + " " + encryptedByteArray[7].ToString("X2"));
 
 
             // Move to next block

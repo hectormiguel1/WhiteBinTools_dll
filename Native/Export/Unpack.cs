@@ -18,13 +18,13 @@ public static class Unpack
             var filesPath = Marshal.PtrToStringUTF8((IntPtr)filesPtr);
             if (filesPath == null) 
             {
-               NativeLogger.Error($"filesPath is null");
+               Log.Error($"filesPath is null");
                 return new NativeStructs.FileEntryList {Items = IntPtr.Zero, Count = 0};
             }
 
             var gameCode = (LibaryEnums.GameCodes)gameCodeRaw;
             var list = new List<NativeStructs.FileEntry>();
-            NativeLogger.Debug($"Getting file metadata for file: {filesPath}, game: {gameCode}");
+            Log.Info($"Getting file metadata for file: {filesPath}, game: {gameCode}");
 
             // Initialize the filelist reader
             var vars = UnpackProcesses.InitializeFilelist(gameCode, filesPath);
@@ -43,7 +43,7 @@ public static class Unpack
                 };
                 list.Add(entry);
             });
-
+            Log.Info($"Successfully extracted file {filesPath} metadata with size: {list.Count}");
             return Exports.MarshalListToArray(list);
         }
         catch (Exception ex)
@@ -65,19 +65,19 @@ public static class Unpack
             var whiteBin = Marshal.PtrToStringUTF8((IntPtr)whiteBinPtr);
             if (files == null || whiteBin == null)
             {
-                NativeLogger.Error($"Either fileList or whiteBin are null\nfileList: {files}, whiteBin: {whiteBin}");
+                Log.Error($"Either fileList or whiteBin are null\nfileList: {files}, whiteBin: {whiteBin}");
                 return Exports.InvalidArgsError;
             }
             var gameCode = (LibaryEnums.GameCodes)gameCodeRaw;
-            NativeLogger.Debug($"Unpacking All files from whiteBin: {whiteBin} game: {gameCode}");
+            Log.Info($"Unpacking All files from whiteBin: {whiteBin} game: {gameCode}");
             // Extracts every file (predicate returns true)
             UnpackProcesses.ExtractFiles(gameCode, files, whiteBin, _ => true);
-            NativeLogger.Info($"Unpack complete for bin: {whiteBin}, game: {gameCode}");
+            Log.Info($"Unpack complete for bin: {whiteBin}, game: {gameCode}");
             return Exports.SuccessReturn; // Success
         }
         catch (Exception ex)
         { 
-            NativeLogger.Error($"Unpack failed with error: {ex.Message}");
+            Log.Error($"Unpack failed with error: {ex.Message}");
             return Exports.ExceptionError; // Fail
         }
     }
@@ -93,7 +93,7 @@ public static class Unpack
 
             if (files == null || whiteBin == null || outDir == null)
             {
-                NativeLogger.Error($"Either fileList, whiteBin or outDir are null\nfileList: {files}, whiteBin: {whiteBin}, outDir:  {outDir}");
+                Log.Error($"Either fileList, whiteBin or outDir are null\nfileList: {files}, whiteBin: {whiteBin}, outDir:  {outDir}");
                 return Exports.InvalidArgsError;
             }
             
@@ -103,15 +103,15 @@ public static class Unpack
                 outDir += "/";
             }
             
-            NativeLogger.Debug($"Unpacking All files from whiteBin: {whiteBin} game: {gameCode} to path: {outDir}");
+            Log.Info($"Unpacking All files from whiteBin: {whiteBin} game: {gameCode} to path: {outDir}");
             // Extracts every file (predicate returns true)
             UnpackProcesses.ExtractFiles(gameCode, files, whiteBin, _ => true, outDir);
-            NativeLogger.Info($"Unpack complete for bin: {whiteBin}, game: {gameCode} to path: {outDir}");
+            Log.Info($"Unpack complete for bin: {whiteBin}, game: {gameCode} to path: {outDir}");
             return Exports.SuccessReturn; // Success
         }
         catch (Exception ex)
         { 
-            NativeLogger.Error($"Unpack failed with error: {ex.Message}");
+            Log.Error($"Unpack failed with error: {ex.Message}");
             return Exports.InvalidArgsError; // Fail
         }
     }
@@ -126,21 +126,21 @@ public static class Unpack
             var targetPath = Marshal.PtrToStringUTF8((IntPtr)targetPathPtr);
             if (files == null || whiteBin == null || targetPath == null)
             {
-                NativeLogger.Error($"Either fileList, whiteBin, directory or targetPath is null." +
+                Log.Error($"Either fileList, whiteBin, directory or targetPath is null." +
                                    $"\nfileList: {files}, whiteBin: {whiteBin}, targetPath: {targetPath}");
                 return Exports.InvalidArgsError;
             }
             var gameCode = (LibaryEnums.GameCodes)gameCodeRaw;
-            NativeLogger.Debug($"Attempting to unpack {targetPath} from {whiteBin} game: {gameCode}...");
+            Log.Info($"Attempting to unpack {targetPath} from {whiteBin} game: {gameCode}...");
 
             // Extracts only if the path matches exactly
             UnpackProcesses.ExtractFiles(gameCode, files, whiteBin, (v) => v.MainPath == targetPath);
-            NativeLogger.Debug($"Unpack successful for {targetPath} from {whiteBin} game: {gameCode}...");
+            Log.Info($"Unpack successful for {targetPath} from {whiteBin} game: {gameCode}...");
             return Exports.SuccessReturn;
         }
         catch (Exception ex)
         {
-            NativeLogger.Error($"Unpack Single failed with error: {ex.Message}");
+            Log.Error($"Unpack Single failed with error: {ex.Message}");
             return Exports.ExceptionError; 
         }
     }
@@ -157,7 +157,7 @@ public static class Unpack
             
             if (files == null || whiteBin == null || targetPath == null || outDir == null)
             {
-                NativeLogger.Error($"Either fileList, whiteBin, directory, targetPath or outDir is null." +
+                Log.Error($"Either fileList, whiteBin, directory, targetPath or outDir is null." +
                                    $"\nfileList: {files}, whiteBin: {whiteBin}, targetPath: {targetPath}, outDir: {outDir}");
                 return Exports.InvalidArgsError;
             }
@@ -169,16 +169,16 @@ public static class Unpack
             }
 
             
-            NativeLogger.Debug($"Attempting to unpack {targetPath} from {whiteBin} game: {gameCode}.to path: {outDir}...");
+            Log.Info($"Attempting to unpack {targetPath} from {whiteBin} game: {gameCode}.to path: {outDir}...");
 
             // Extracts only if the path matches exactly
             UnpackProcesses.ExtractFiles(gameCode, files, whiteBin, (v) => v.MainPath == targetPath, outDir);
-            NativeLogger.Debug($"Unpack successful for {targetPath} from {whiteBin} game: {gameCode}...");
+            Log.Info($"Unpack successful for {targetPath} from {whiteBin} game: {gameCode}...");
             return Exports.SuccessReturn;
         }
         catch (Exception ex)
         {
-            NativeLogger.Error($"Unpack Single failed with error: {ex.Message}");
+            Log.Error($"Unpack Single failed with error: {ex.Message}");
             return Exports.ExceptionError; 
         }
     }
@@ -194,7 +194,7 @@ public static class Unpack
             var targetDir = Marshal.PtrToStringUTF8((IntPtr)directoryPtr);
             if (files == null || whiteBin == null || targetDir == null)
             {
-                NativeLogger.Error($"Either fileList, whiteBin, directory or targetDir is null." +
+                Log.Error($"Either fileList, whiteBin, directory or targetDir is null." +
                                    $"\nfileList: {files}, whiteBin: {whiteBin}, targetDir: {targetDir}");
                 return Exports.InvalidArgsError;
             }
@@ -204,7 +204,7 @@ public static class Unpack
             
             // Logic from UnpackTypeC: remove wildcard
             targetDir = targetDir.Replace("*", "");
-            NativeLogger.Debug($"Attempting to unpack {targetDir} game: {gameCode}...");
+            Log.Info($"Attempting to unpack {targetDir} game: {gameCode}...");
             // Extracts if the path starts with the directory
             UnpackProcesses.ExtractFiles(gameCode, files, whiteBin, (v) => 
             {
@@ -221,12 +221,12 @@ public static class Unpack
 
                 return assembledDir == targetDir;
             });
-            NativeLogger.Debug($"Unpack successful for path {targetDir} game: {gameCode}...");
+            Log.Info($"Unpack successful for path {targetDir} game: {gameCode}...");
             return Exports.SuccessReturn;
         }
         catch (Exception ex)
         {
-            NativeLogger.Error("Unpack failed with error: " + ex.Message);
+            Log.Error("Unpack failed with error: " + ex.Message);
             return Exports.ExceptionError; 
         }
     }
@@ -244,7 +244,7 @@ public static class Unpack
 
             if (files == null || whiteBin == null || targetDir == null || outDir == null)
             {
-                NativeLogger.Error($"Either fileList, whiteBin, directory, targetDir or outDir is null." +
+                Log.Error($"Either fileList, whiteBin, directory, targetDir or outDir is null." +
                                    $"\nfileList: {files}, whiteBin: {whiteBin}, targetDir: {targetDir}, out outDir: {outDir}");
                 return Exports.InvalidArgsError;
             }
@@ -256,7 +256,7 @@ public static class Unpack
 
             // Logic from UnpackTypeC: remove wildcard
             targetDir = targetDir.Replace("*", "");
-            NativeLogger.Debug($"Attempting to unpack pattern {targetDir} game: {gameCode} to path: {outDir}...");
+            Log.Info($"Attempting to unpack pattern {targetDir} game: {gameCode} to path: {outDir}...");
 
             // Extracts if the path starts with the directory
             UnpackProcesses.ExtractFiles(gameCode, files, whiteBin, (v) => 
@@ -274,12 +274,12 @@ public static class Unpack
 
                 return assembledDir == targetDir;
             }, outDir);
-            NativeLogger.Debug($"Unpack successful for path {targetDir} game: {gameCode}...");
+            Log.Info($"Unpack successful for path {targetDir} game: {gameCode}...");
             return Exports.SuccessReturn;
         }
         catch (Exception ex)
         {
-            NativeLogger.Error("Unpack failed with error: " + ex.Message);
+            Log.Error("Unpack failed with error: " + ex.Message);
             return Exports.ExceptionError; 
         }
     }
@@ -291,13 +291,13 @@ public static class Unpack
     [UnmanagedCallersOnly(EntryPoint = "free_metadata" , CallConvs = [typeof(CallConvCdecl)])]
     public static void FreeMetadata(NativeStructs.FileEntryList list)
     {
-        NativeLogger.Debug($"Cleaning up memory for {list.Items} item(s)...");
+        
         if (list.Items == IntPtr.Zero)
         {
-            NativeLogger.Warn("Total items to clean are 0, skipping freeing memory...");
+            Log.Warn("Total items to clean are 0, skipping freeing memory...");
             return;
         }
-        
+        Log.Info($"Cleaning up memory for {list.Count} item(s)...");
         var sizeOfEntry = Marshal.SizeOf<NativeStructs.FileEntry>();
         
         // Loop through the array to free the individual string pointers
@@ -312,7 +312,7 @@ public static class Unpack
             }
         }
         
-        NativeLogger.Debug($"Cleaning up memory for {list.Items} item(s) done");
+        Log.Info($"Cleaning up memory for {list.Count} item(s) done");
         // Free the array block itself
         Marshal.FreeCoTaskMem(list.Items);
     }

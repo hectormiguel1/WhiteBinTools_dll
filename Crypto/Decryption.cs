@@ -2,7 +2,8 @@
 
 internal static class Decryption
 {
-    public static void DecryptBlocks(byte[] xorTable, uint blockCount, uint readPos, uint writePos, BinaryReader inFileReader, BinaryWriter decryptedStreamBinWriter, bool logDisplay)
+    public static void DecryptBlocks(byte[] xorTable, uint blockCount, uint readPos, uint writePos,
+        BinaryReader inFileReader, BinaryWriter decryptedStreamBinWriter, bool logDisplay)
     {
         uint blockCounter = 0;
 
@@ -54,7 +55,8 @@ internal static class Decryption
             byte[] decryptedBytesArray =
             [
                 (byte)decryptedByte5, (byte)decryptedByte6, (byte)decryptedByte7,
-                (byte)decryptedByte8, (byte)decryptedByte1, (byte)decryptedByte2, (byte)decryptedByte3, (byte)decryptedByte4
+                (byte)decryptedByte8, (byte)decryptedByte1, (byte)decryptedByte2, (byte)decryptedByte3,
+                (byte)decryptedByte4
             ];
 
             var decryptedBytesHigherVal = BitConverter.ToUInt32(decryptedBytesArray, 0);
@@ -104,19 +106,17 @@ internal static class Decryption
             decryptedStreamBinWriter.Write(decryptedByteLowerArray);
 
 
-            if (logDisplay)
-            {
-                Console.Write($"Block: {i}  ");
+            Log.Debug($"Block: {i}  ");
 
-                Console.Write(decryptedByteHigherArray[0].ToString("X2") + " " +
-                              decryptedByteHigherArray[1].ToString("X2") + " " + decryptedByteHigherArray[2].ToString("X2") + " " +
-                              decryptedByteHigherArray[3].ToString("X2") + " ");
+            Log.Debug(decryptedByteHigherArray[0].ToString("X2") + " " +
+                      decryptedByteHigherArray[1].ToString("X2") + " " + decryptedByteHigherArray[2].ToString("X2") +
+                      " " +
+                      decryptedByteHigherArray[3].ToString("X2") + " ");
 
-                Console.WriteLine(decryptedByteLowerArray[0].ToString("X2") + " " +
-                                  decryptedByteLowerArray[1].ToString("X2") + " " + decryptedByteLowerArray[2].ToString("X2") + " " +
-                                  decryptedByteLowerArray[3].ToString("X2"));
-            }
-
+            Log.Debug(decryptedByteLowerArray[0].ToString("X2") + " " +
+                      decryptedByteLowerArray[1].ToString("X2") + " " + decryptedByteLowerArray[2].ToString("X2") +
+                      " " +
+                      decryptedByteLowerArray[3].ToString("X2"));
 
             // Move to next block
             blockCounter += 8;

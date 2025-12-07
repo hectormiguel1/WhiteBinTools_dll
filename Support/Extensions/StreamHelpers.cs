@@ -22,7 +22,7 @@ public static class StreamHelpers
 
             if (!showProgress) continue;
             var currentAmount = Math.Round(((decimal)amountCopied / size) * 100);
-            Console.Write("\r{0}", "Copied " + currentAmount + "%");
+            Log.Debug("Copied " + currentAmount + "%");
         }
     }
 

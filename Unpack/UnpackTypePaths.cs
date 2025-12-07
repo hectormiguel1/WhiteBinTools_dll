@@ -70,6 +70,6 @@ public class UnpackTypePaths
             }
         }
 
-        Console.WriteLine($"\nFinished writing filepaths to \"{Path.GetFileName(outTxtFile)}\"");
+        Log.Info($"\nFinished writing filepaths to \"{Path.GetFileName(outTxtFile)}\"");
     }
 }
