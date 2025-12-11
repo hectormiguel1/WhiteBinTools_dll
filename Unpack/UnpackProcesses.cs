@@ -113,21 +113,21 @@ internal static class UnpackProcesses
                 UnpackFile(vars, whiteBinStream, unpackVars);
                 hasExtracted = true;
 
-                Log.Debug($"{unpackVars.UnpackedState} _{Path.Combine(unpackVars.ExtractDirName, vars.MainPath)}");
+                Log.Fine($"{unpackVars.UnpackedState} _{Path.Combine(unpackVars.ExtractDirName, vars.MainPath)}");
             });
         }
 
         if (hasExtracted)
         {
-            Log.Debug($"Finished unpacking \"{unpackVars.WhiteBinName}\"");
+            Log.Fine($"Finished unpacking \"{unpackVars.WhiteBinName}\"");
             if (unpackVars.CountDuplicates > 0)
             {
-                Log.Warn($"{unpackVars.CountDuplicates} duplicate file(s)");
+                Log.Warning($"{unpackVars.CountDuplicates} duplicate file(s)");
             }
         }
         else
         {
-            Log.Warn("Specified file/directory does not exist or nothing was extracted.");
+            Log.Warning("Specified file/directory does not exist or nothing was extracted.");
         }
     }
 

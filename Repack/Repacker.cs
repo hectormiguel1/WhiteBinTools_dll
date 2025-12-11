@@ -52,7 +52,7 @@ public static class Repacker
         coreLogic(filelistVariables, repackVariables, newChunksDict);
 
         // 5. Finalize: Build new Filelist and Encrypt
-        Log.Debug("Building filelist....");
+        Log.Fine("Building filelist....");
         RepackFilelistData.BuildFilelist(filelistVariables, newChunksDict, repackVariables, gameCode);
 
         if (filelistVariables.IsEncrypted)
@@ -72,9 +72,9 @@ public static class Repacker
         bool bckup,
         Action<RepackVariables, Dictionary<int, List<byte>>> coreLogic)
     {
-        Log.Debug("TotalChunks: " + filelistVariables.TotalChunks);
-        Log.Debug("No of files: " + filelistVariables.TotalFiles + "\n");
-        Log.Debug("Building filelist....");
+        Log.Fine("TotalChunks: " + filelistVariables.TotalChunks);
+        Log.Fine("No of files: " + filelistVariables.TotalFiles + "\n");
+        Log.Fine("Building filelist....");
 
         var repackVariables = new RepackVariables
         {

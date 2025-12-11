@@ -127,9 +127,9 @@ internal static class Encryption
             encryptedStreamBinWriter.Write(encryptedByteArray);
 
 
-            Log.Debug($"Block: {i}  ");
+            Log.Fine($"Block: {i}  ");
 
-            Log.Debug(encryptedByteArray[0].ToString("X2") + " " + encryptedByteArray[1].ToString("X2") + " " +
+            Log.Fine(encryptedByteArray[0].ToString("X2") + " " + encryptedByteArray[1].ToString("X2") + " " +
                       encryptedByteArray[2].ToString("X2") + " " + encryptedByteArray[3].ToString("X2") + " " +
                       encryptedByteArray[4].ToString("X2") + " " + encryptedByteArray[5].ToString("X2") + " " +
                       encryptedByteArray[6].ToString("X2") + " " + encryptedByteArray[7].ToString("X2"));

@@ -40,11 +40,11 @@ public static class RepackActions
 
                 RepackProcesses.RepackTypeAppend(repackVars, newWhiteBinStream, repackVars.OgFullFilePath);
                 
-                Log.Debug($"{repackVars.RepackState} {Path.Combine(repackVars.NewWhiteBinFileName, repackVars.RepackLogMsg)} (Appended)");
+                Log.Fine($"{repackVars.RepackState} {Path.Combine(repackVars.NewWhiteBinFileName, repackVars.RepackLogMsg)} (Appended)");
                 return true;
             });
 
-            Log.Debug($"Finished repacking files to \"{repackVars.NewWhiteBinFileName}\"");
+            Log.Fine($"Finished repacking files to \"{repackVars.NewWhiteBinFileName}\"");
         });
     }
 
@@ -71,12 +71,12 @@ public static class RepackActions
                 var currentFilePath = Path.Combine(repackVars.OgDirectoryPath, repackVars.OgFileName);
                 if (currentFilePath != targetFilePath) return false;
                 var packedAs = Repacker.PerformInjectOrAppend(repackVars);
-                Log.Debug($"{repackVars.RepackState} {Path.Combine(repackVars.NewWhiteBinFileName, repackVars.RepackLogMsg)} {packedAs}");
+                Log.Fine($"{repackVars.RepackState} {Path.Combine(repackVars.NewWhiteBinFileName, repackVars.RepackLogMsg)} {packedAs}");
                 hasPacked = true;
                 return true;
             });
 
-            Log.Debug(hasPacked
+            Log.Fine(hasPacked
                 ? $"Finished repacking file(s) into \"{repackVars.NewWhiteBinFileName}\""
                 : "Specified file does not exist. please specify the correct file path.");
         });
@@ -99,12 +99,12 @@ public static class RepackActions
                 var currentFileInProcess = Path.Combine(repackVars.OgDirectoryPath, repackVars.OgFileName);
                 if (!File.Exists(Path.Combine(whiteExtractedDir, currentFileInProcess))) return false;
                 var packedAs = Repacker.PerformInjectOrAppend(repackVars);
-                Log.Debug($"{repackVars.RepackState} {Path.Combine(repackVars.NewWhiteBinFileName, repackVars.RepackLogMsg)} {packedAs}");
+                Log.Fine($"{repackVars.RepackState} {Path.Combine(repackVars.NewWhiteBinFileName, repackVars.RepackLogMsg)} {packedAs}");
                 hasPacked = true;
                 return true;
             });
 
-            Log.Debug(hasPacked
+            Log.Fine(hasPacked
                 ? $"\nFinished repacking multiple files into \"{repackVars.NewWhiteBinFileName}\""
                 : "Specified directory does not exist or contains no matching files.");
         });
@@ -160,7 +160,7 @@ public static class RepackActions
             filelistVars.EntriesData = entriesStream.ToArray();
         });
 
-        Log.Debug($"Finished repacking filelist data.");
+        Log.Fine($"Finished repacking filelist data.");
     }
 
    // =======================================================================
@@ -226,7 +226,7 @@ public static class RepackActions
             filelistVars.EntriesData = entriesStream.ToArray();
         });
 
-        Log.Debug("Finished repacking JSON data.");
+        Log.Fine("Finished repacking JSON data.");
     }
 
     

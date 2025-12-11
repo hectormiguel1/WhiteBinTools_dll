@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-#include "native_logger.h"
+#include "common.h"
     /* =======================================================================
      * Common Types
      * ======================================================================= */
@@ -32,14 +32,6 @@ extern "C" {
         FF132 = 1
     } GameCode;
     
-    typedef enum
-    {
-        FILE_NOT_FOUND = -2,
-        INVLID_ARGS = -1,
-        SUCCESS = 0, 
-        EXCEPTION_ERROR = 1,
-        
-    } WBT_STATUS;
     
     /* =======================================================================
  * Struct Definitions (Must match NativeStructs.cs layout)
@@ -54,8 +46,10 @@ extern "C" {
 
     typedef struct {
         FileEntry* items;     // Array pointer
-        unsigned int count;
+        int count;            // Changed to int to match C#
     } FileEntryList;
+
+    
 
 #ifdef __cplusplus
 }

@@ -22,7 +22,7 @@ internal static class FilelistCrypto
 
                 if (filelistVariables.IsEncrypted)
                 {
-                    Log.Error("Error: Detected encrypted filelist file. set the game code to 'ff132' for handling this type of filelist");
+                    Log.Fatal("Error: Detected encrypted filelist file. set the game code to 'ff132' for handling this type of filelist");
                     throw new ArgumentException("Encrypted filelist with FF13-1 Game mode set!");
                 }
 
@@ -54,7 +54,7 @@ internal static class FilelistCrypto
 
             if (cryptBodySize % 8 != 0)
             {
-                Log.Error("Length of the body to decrypt/encrypt is not valid");
+                Log.Fatal("Length of the body to decrypt/encrypt is not valid");
                 throw new InvalidDataContractException("Length of the body to decrypt/encrypt is not valid");
             }
 
@@ -80,7 +80,7 @@ internal static class FilelistCrypto
                 CommonMethods.IfFileExistsDel(filelistVariables.TmpDcryptFilelistFile);
                 File.Copy(filelistVariables.MainFilelistFile, filelistVariables.TmpDcryptFilelistFile);
 
-                Log.Debug("Decrypting the filelist...");
+                Log.Fine("Decrypting the filelist...");
                 CryptFilelist.ProcessFilelist(CryptActions.D, filelistVariables.TmpDcryptFilelistFile);
 
                 using (var decFilelistReader = new BinaryReader(File.Open(filelistVariables.TmpDcryptFilelistFile, FileMode.Open, FileAccess.Read), GlobalConfig.DefaultEncoding))
@@ -94,7 +94,7 @@ internal static class FilelistCrypto
 
                     if (filelistHash != decFilelistReader.ComputeCheckSum(filelistDataSize / 4, 32))
                     {
-                        Log.Error("Filelist was not decrypted correctly");
+                        Log.Fatal("Filelist was not decrypted correctly");
                         throw new InvalidDataContractException("Failed to decrypt the filelist");
                     }
                 }

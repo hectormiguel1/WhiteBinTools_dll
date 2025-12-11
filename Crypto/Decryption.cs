@@ -106,14 +106,14 @@ internal static class Decryption
             decryptedStreamBinWriter.Write(decryptedByteLowerArray);
 
 
-            Log.Debug($"Block: {i}  ");
+            Log.Fine($"Block: {i}  ");
 
-            Log.Debug(decryptedByteHigherArray[0].ToString("X2") + " " +
+            Log.Fine(decryptedByteHigherArray[0].ToString("X2") + " " +
                       decryptedByteHigherArray[1].ToString("X2") + " " + decryptedByteHigherArray[2].ToString("X2") +
                       " " +
                       decryptedByteHigherArray[3].ToString("X2") + " ");
 
-            Log.Debug(decryptedByteLowerArray[0].ToString("X2") + " " +
+            Log.Fine(decryptedByteLowerArray[0].ToString("X2") + " " +
                       decryptedByteLowerArray[1].ToString("X2") + " " + decryptedByteLowerArray[2].ToString("X2") +
                       " " +
                       decryptedByteLowerArray[3].ToString("X2"));

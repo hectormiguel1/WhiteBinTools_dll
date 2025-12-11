@@ -6,7 +6,7 @@ internal static class CommonMethods
 {
     public static void ErrorExit(string errorMsg)
     {
-        Log.Error(errorMsg);
+        Log.Fatal(errorMsg);
         throw new Exception(errorMsg);
     }
 

@@ -14,7 +14,7 @@ public class UnpackActions
         
         if (Directory.Exists(tempVars.ExtractDir))
         {
-            Log.Warn("Detected previous unpack. deleting....");
+            Log.Warning("Detected previous unpack. deleting....");
             CommonMethods.IfDirExistsDel(tempVars.ExtractDir);
         }
 
@@ -109,7 +109,7 @@ public class UnpackActions
             }
         }
 
-        Log.Debug($"Finished unpacking \"{filelistOutName}\"");
+        Log.Fine($"Finished unpacking \"{filelistOutName}\"");
     }
     
     public static void UnpackFilelistPaths(LibaryEnums.GameCodes gameCode, string filelistFile)
@@ -128,6 +128,6 @@ public class UnpackActions
             outchunkWriter.WriteLine("end");
         }
 
-        Log.Debug($"Finished writing filepaths to \"{Path.GetFileName(outTxtFile)}\"");
+        Log.Fine($"Finished writing filepaths to \"{Path.GetFileName(outTxtFile)}\"");
     }
 }

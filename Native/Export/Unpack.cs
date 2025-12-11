@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using WhiteBinTools.Support;
 using WhiteBinTools.Unpack;
+using Native.Common;
 
 namespace WhiteBinTools.Native.Export;
 
@@ -11,15 +12,16 @@ public static class Unpack
     // 1. Metadata Binding
     // ---------------------------------------------------------
     [UnmanagedCallersOnly(EntryPoint = "get_file_metadata", CallConvs = [typeof(CallConvCdecl)])]
-    public static unsafe NativeStructs.FileEntryList GetFileMetadata(int gameCodeRaw, byte* filesPtr)
+    public static unsafe NativeResult.Result<NativeStructs.FileEntryList> GetFileMetadata(int gameCodeRaw, byte* filesPtr)
     {
         try
         {
-            var filesPath = Marshal.PtrToStringUTF8((IntPtr)filesPtr);
-            if (filesPath == null) 
+            var filesPath = NativeResult.StringFromPtr(filesPtr);
+            if (string.IsNullOrEmpty(filesPath))
             {
-               Log.Error($"filesPath is null");
-                return new NativeStructs.FileEntryList {Items = IntPtr.Zero, Count = 0};
+                var msg = $"filesPath is null or empty. Got value: {filesPath}";
+                Log.Fatal(msg);
+                return NativeResult.CreateError<NativeStructs.FileEntryList>(msg, Exports.InvalidArgsError);
             }
 
             var gameCode = (LibaryEnums.GameCodes)gameCodeRaw;
@@ -39,17 +41,19 @@ public static class Unpack
                     // ff131 uses 'ChunkNumber', ff132 uses 'CurrentChunkNumber'
                     ChunkIndex = (gameCode == LibaryEnums.GameCodes.Ff131) ? vars.ChunkNumber : vars.CurrentChunkNumber,
                     // Allocate unmanaged memory for the string so it survives until FreeMetadata is called
-                    FilePath = Marshal.StringToCoTaskMemUTF8(vars.PathString)
+                    FilePath = (byte*)Marshal.StringToCoTaskMemUTF8(vars.PathString)
                 };
                 list.Add(entry);
             });
             Log.Info($"Successfully extracted file {filesPath} metadata with size: {list.Count}");
-            return Exports.MarshalListToArray(list);
+            // Use Export helper to wrap list in Result
+            return NativeResult.CreateSuccess(Exports.MarshalListToArray(list));
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[WBT Native Error] GetFileMetadata: {ex.Message}. Stacktrace: {ex.StackTrace} {ex.Data} {ex.ToString()}");
-            return new NativeStructs.FileEntryList { Items = IntPtr.Zero, Count = 0 };
+            var msg = $"[WBT Native Error] GetFileMetadata: {ex.Message}";
+            Log.Fatal($"{msg}. Stacktrace: {ex.StackTrace}");
+            return NativeResult.CreateError<NativeStructs.FileEntryList>(msg, Exports.ExceptionError);
         }
     }
     // ---------------------------------------------------------
@@ -57,44 +61,46 @@ public static class Unpack
     // ---------------------------------------------------------
 
     [UnmanagedCallersOnly(EntryPoint = "unpack_all", CallConvs = [typeof(CallConvCdecl)])]
-    public static unsafe int UnpackAll(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr)
+    public static unsafe NativeResult.Result<int> UnpackAll(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr)
     {
         try 
         {
-            var files = Marshal.PtrToStringUTF8((IntPtr)filesPtr);
-            var whiteBin = Marshal.PtrToStringUTF8((IntPtr)whiteBinPtr);
-            if (files == null || whiteBin == null)
+            var files = NativeResult.StringFromPtr(filesPtr);
+            var whiteBin = NativeResult.StringFromPtr(whiteBinPtr);
+            if (string.IsNullOrEmpty(files) || string.IsNullOrEmpty(whiteBin))
             {
-                Log.Error($"Either fileList or whiteBin are null\nfileList: {files}, whiteBin: {whiteBin}");
-                return Exports.InvalidArgsError;
+                var msg = $"Either fileList or whiteBin are null\nfileList: {files}, whiteBin: {whiteBin}";
+                Log.Fatal(msg);
+                return NativeResult.CreateError<int>(msg, Exports.InvalidArgsError);
             }
             var gameCode = (LibaryEnums.GameCodes)gameCodeRaw;
             Log.Info($"Unpacking All files from whiteBin: {whiteBin} game: {gameCode}");
             // Extracts every file (predicate returns true)
             UnpackProcesses.ExtractFiles(gameCode, files, whiteBin, _ => true);
             Log.Info($"Unpack complete for bin: {whiteBin}, game: {gameCode}");
-            return Exports.SuccessReturn; // Success
+            return NativeResult.CreateInlineSuccess(Exports.SuccessReturn);
         }
         catch (Exception ex)
-        { 
-            Log.Error($"Unpack failed with error: {ex.Message}");
-            return Exports.ExceptionError; // Fail
+        {
+            Log.Fatal($"Unpack failed with error: {ex.Message}");
+            return NativeResult.CreateError<int>(ex.Message, Exports.ExceptionError);
         }
     }
     [UnmanagedCallersOnly(EntryPoint = "unpack_all_to_path" , CallConvs = [typeof(CallConvCdecl)])]
-    public static unsafe int UnpackAllToPath(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr, byte* outDirPtr)
+    public static unsafe NativeResult.Result<int> UnpackAllToPath(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr, byte* outDirPtr)
     {
         try 
         {
-            var files = Marshal.PtrToStringUTF8((IntPtr)filesPtr);
-            var whiteBin = Marshal.PtrToStringUTF8((IntPtr)whiteBinPtr);
-            var outDir  = Marshal.PtrToStringUTF8((IntPtr)outDirPtr);
+            var files = NativeResult.StringFromPtr(filesPtr);
+            var whiteBin = NativeResult.StringFromPtr(whiteBinPtr);
+            var outDir  = NativeResult.StringFromPtr(outDirPtr);
             var gameCode = (LibaryEnums.GameCodes)gameCodeRaw;
 
-            if (files == null || whiteBin == null || outDir == null)
+            if ( string.IsNullOrEmpty(files) || string.IsNullOrEmpty(whiteBin) || string.IsNullOrEmpty(outDir))
             {
-                Log.Error($"Either fileList, whiteBin or outDir are null\nfileList: {files}, whiteBin: {whiteBin}, outDir:  {outDir}");
-                return Exports.InvalidArgsError;
+                var msg = $"Either fileList, whiteBin or outDir are null\nfileList: {files}, whiteBin: {whiteBin}, outDir:  {outDir}";
+                Log.Fatal(msg);
+                return NativeResult.CreateError<int>(msg, Exports.InvalidArgsError);
             }
             
             //add the path
@@ -107,28 +113,29 @@ public static class Unpack
             // Extracts every file (predicate returns true)
             UnpackProcesses.ExtractFiles(gameCode, files, whiteBin, _ => true, outDir);
             Log.Info($"Unpack complete for bin: {whiteBin}, game: {gameCode} to path: {outDir}");
-            return Exports.SuccessReturn; // Success
+            return NativeResult.CreateInlineSuccess(Exports.SuccessReturn);
         }
         catch (Exception ex)
-        { 
-            Log.Error($"Unpack failed with error: {ex.Message}");
-            return Exports.InvalidArgsError; // Fail
+        {
+            Log.Fatal($"Unpack failed with error: {ex.Message}");
+            return NativeResult.CreateError<int>(ex.Message, Exports.ExceptionError);
         }
     }
 
     [UnmanagedCallersOnly(EntryPoint = "unpack_single" , CallConvs = [typeof(CallConvCdecl)])]
-    public static unsafe int UnpackSingle(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr, byte* targetPathPtr)
+    public static unsafe NativeResult.Result<int> UnpackSingle(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr, byte* targetPathPtr)
     {
         try
         {
-            var files = Marshal.PtrToStringUTF8((IntPtr)filesPtr);
-            var whiteBin = Marshal.PtrToStringUTF8((IntPtr)whiteBinPtr);
-            var targetPath = Marshal.PtrToStringUTF8((IntPtr)targetPathPtr);
-            if (files == null || whiteBin == null || targetPath == null)
+            var files = NativeResult.StringFromPtr(filesPtr);
+            var whiteBin = NativeResult.StringFromPtr(whiteBinPtr);
+            var targetPath = NativeResult.StringFromPtr(targetPathPtr);
+            if (string.IsNullOrEmpty(files) || string.IsNullOrEmpty(whiteBin) || string.IsNullOrEmpty(targetPath))
             {
-                Log.Error($"Either fileList, whiteBin, directory or targetPath is null." +
-                                   $"\nfileList: {files}, whiteBin: {whiteBin}, targetPath: {targetPath}");
-                return Exports.InvalidArgsError;
+                var msg = $"Either fileList, whiteBin, directory or targetPath is null."
+                          +$"\nfileList: {files}, whiteBin: {whiteBin}, targetPath: {targetPath}";
+                Log.Fatal(msg);
+                return NativeResult.CreateError<int>(msg, Exports.InvalidArgsError);
             }
             var gameCode = (LibaryEnums.GameCodes)gameCodeRaw;
             Log.Info($"Attempting to unpack {targetPath} from {whiteBin} game: {gameCode}...");
@@ -136,30 +143,31 @@ public static class Unpack
             // Extracts only if the path matches exactly
             UnpackProcesses.ExtractFiles(gameCode, files, whiteBin, (v) => v.MainPath == targetPath);
             Log.Info($"Unpack successful for {targetPath} from {whiteBin} game: {gameCode}...");
-            return Exports.SuccessReturn;
+            return NativeResult.CreateInlineSuccess(Exports.SuccessReturn);
         }
         catch (Exception ex)
         {
-            Log.Error($"Unpack Single failed with error: {ex.Message}");
-            return Exports.ExceptionError; 
+            Log.Fatal($"Unpack Single failed with error: {ex.Message}");
+            return NativeResult.CreateError<int>(ex.Message, Exports.ExceptionError);
         }
     }
     [UnmanagedCallersOnly(EntryPoint = "unpack_single_to_path" , CallConvs = [typeof(CallConvCdecl)])]
-    public static unsafe int UnpackSingleToPath(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr, byte* targetPathPtr, byte* outDirPtr)
+    public static unsafe NativeResult.Result<int> UnpackSingleToPath(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr, byte* targetPathPtr, byte* outDirPtr)
     {
         try
         {
-            var files = Marshal.PtrToStringUTF8((IntPtr)filesPtr);
-            var whiteBin = Marshal.PtrToStringUTF8((IntPtr)whiteBinPtr);
-            var targetPath = Marshal.PtrToStringUTF8((IntPtr)targetPathPtr);
-            var outDir  = Marshal.PtrToStringUTF8((IntPtr)outDirPtr);
+            var files = NativeResult.StringFromPtr(filesPtr);
+            var whiteBin = NativeResult.StringFromPtr(whiteBinPtr);
+            var targetPath = NativeResult.StringFromPtr(targetPathPtr);
+            var outDir  = NativeResult.StringFromPtr(outDirPtr);
             var gameCode = (LibaryEnums.GameCodes)gameCodeRaw;
             
-            if (files == null || whiteBin == null || targetPath == null || outDir == null)
+            if (string.IsNullOrEmpty(files) || string.IsNullOrEmpty(whiteBin) || string.IsNullOrEmpty(targetPath) || string.IsNullOrEmpty(outDir))
             {
-                Log.Error($"Either fileList, whiteBin, directory, targetPath or outDir is null." +
-                                   $"\nfileList: {files}, whiteBin: {whiteBin}, targetPath: {targetPath}, outDir: {outDir}");
-                return Exports.InvalidArgsError;
+                var msg = $"Either fileList, whiteBin, directory, targetPath or outDir is null."
+                          +"\nfileList: {files}, whiteBin: {whiteBin}, targetPath: {targetPath}, outDir: {outDir}";
+                Log.Fatal(msg);
+                return NativeResult.CreateError<int>(msg, Exports.InvalidArgsError);
             }
 
             //add the path
@@ -174,29 +182,30 @@ public static class Unpack
             // Extracts only if the path matches exactly
             UnpackProcesses.ExtractFiles(gameCode, files, whiteBin, (v) => v.MainPath == targetPath, outDir);
             Log.Info($"Unpack successful for {targetPath} from {whiteBin} game: {gameCode}...");
-            return Exports.SuccessReturn;
+            return NativeResult.CreateInlineSuccess(Exports.SuccessReturn);
         }
         catch (Exception ex)
         {
-            Log.Error($"Unpack Single failed with error: {ex.Message}");
-            return Exports.ExceptionError; 
+            Log.Fatal($"Unpack Single failed with error: {ex.Message}");
+            return NativeResult.CreateError<int>(ex.Message, Exports.ExceptionError);
         }
     }
     
     
     [UnmanagedCallersOnly(EntryPoint = "unpack_multiple", CallConvs = [typeof(CallConvCdecl)])]
-    public static unsafe int UnpackMultiple(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr, byte* directoryPtr)
+    public static unsafe NativeResult.Result<int> UnpackMultiple(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr, byte* directoryPtr)
     {
         try
         {
-            var files = Marshal.PtrToStringUTF8((IntPtr)filesPtr);
-            var whiteBin = Marshal.PtrToStringUTF8((IntPtr)whiteBinPtr);
-            var targetDir = Marshal.PtrToStringUTF8((IntPtr)directoryPtr);
-            if (files == null || whiteBin == null || targetDir == null)
+            var files = NativeResult.StringFromPtr(filesPtr);
+            var whiteBin = NativeResult.StringFromPtr(whiteBinPtr);
+            var targetDir = NativeResult.StringFromPtr(directoryPtr);
+            if (string.IsNullOrEmpty(files) || string.IsNullOrEmpty(whiteBin) || string.IsNullOrEmpty(targetDir))
             {
-                Log.Error($"Either fileList, whiteBin, directory or targetDir is null." +
-                                   $"\nfileList: {files}, whiteBin: {whiteBin}, targetDir: {targetDir}");
-                return Exports.InvalidArgsError;
+                var msg = $"Either fileList, whiteBin, directory or targetDir is null."
+                          +"\nfileList: {files}, whiteBin: {whiteBin}, targetDir: {targetDir}";
+                Log.Fatal(msg);
+                return NativeResult.CreateError<int>(msg, Exports.InvalidArgsError);
             }
 
             var gameCode = (LibaryEnums.GameCodes)gameCodeRaw;
@@ -222,31 +231,32 @@ public static class Unpack
                 return assembledDir == targetDir;
             });
             Log.Info($"Unpack successful for path {targetDir} game: {gameCode}...");
-            return Exports.SuccessReturn;
+            return NativeResult.CreateInlineSuccess(Exports.SuccessReturn);
         }
         catch (Exception ex)
         {
-            Log.Error("Unpack failed with error: " + ex.Message);
-            return Exports.ExceptionError; 
+            Log.Fatal("Unpack failed with error: " + ex.Message);
+            return NativeResult.CreateError<int>(ex.Message, Exports.ExceptionError);
         }
     }
 
     [UnmanagedCallersOnly(EntryPoint = "unpack_multiple_to_path" , CallConvs = [typeof(CallConvCdecl)])]
-    public static unsafe int UnpackMultipleToPath(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr, byte* directoryPtr, byte* outDirPtr)
+    public static unsafe NativeResult.Result<int> UnpackMultipleToPath(int gameCodeRaw, byte* filesPtr, byte* whiteBinPtr, byte* directoryPtr, byte* outDirPtr)
     {
         try
         {
-            var files = Marshal.PtrToStringUTF8((IntPtr)filesPtr);
-            var whiteBin = Marshal.PtrToStringUTF8((IntPtr)whiteBinPtr);
-            var targetDir = Marshal.PtrToStringUTF8((IntPtr)directoryPtr);
-            var outDir  = Marshal.PtrToStringUTF8((IntPtr)outDirPtr);
+            var files = NativeResult.StringFromPtr(filesPtr);
+            var whiteBin = NativeResult.StringFromPtr(whiteBinPtr);
+            var targetDir = NativeResult.StringFromPtr(directoryPtr);
+            var outDir  = NativeResult.StringFromPtr(outDirPtr);
             var gameCode = (LibaryEnums.GameCodes)gameCodeRaw;
 
-            if (files == null || whiteBin == null || targetDir == null || outDir == null)
+            if (string.IsNullOrEmpty(files) || string.IsNullOrEmpty(whiteBin) || string.IsNullOrEmpty(targetDir) || string.IsNullOrEmpty(outDir))
             {
-                Log.Error($"Either fileList, whiteBin, directory, targetDir or outDir is null." +
-                                   $"\nfileList: {files}, whiteBin: {whiteBin}, targetDir: {targetDir}, out outDir: {outDir}");
-                return Exports.InvalidArgsError;
+                var msg = $"Either fileList, whiteBin, directory, targetDir or outDir is null."
+                          +"\nfileList: {files}, whiteBin: {whiteBin}, targetDir: {targetDir}, out outDir: {outDir}";
+                Log.Fatal(msg);
+                return NativeResult.CreateError<int>(msg, Exports.InvalidArgsError);
             }
             //add the path
             if (!outDir.EndsWith('/'))
@@ -275,45 +285,12 @@ public static class Unpack
                 return assembledDir == targetDir;
             }, outDir);
             Log.Info($"Unpack successful for path {targetDir} game: {gameCode}...");
-            return Exports.SuccessReturn;
+            return NativeResult.CreateInlineSuccess(Exports.SuccessReturn);
         }
         catch (Exception ex)
         {
-            Log.Error("Unpack failed with error: " + ex.Message);
-            return Exports.ExceptionError; 
+            Log.Fatal("Unpack failed with error: " + ex.Message);
+            return NativeResult.CreateError<int>(ex.Message, Exports.ExceptionError);
         }
-    }
-    
-    // ---------------------------------------------------------
-    // 3. Memory Management Helpers
-    // ---------------------------------------------------------
-
-    [UnmanagedCallersOnly(EntryPoint = "free_metadata" , CallConvs = [typeof(CallConvCdecl)])]
-    public static void FreeMetadata(NativeStructs.FileEntryList list)
-    {
-        
-        if (list.Items == IntPtr.Zero)
-        {
-            Log.Warn("Total items to clean are 0, skipping freeing memory...");
-            return;
-        }
-        Log.Info($"Cleaning up memory for {list.Count} item(s)...");
-        var sizeOfEntry = Marshal.SizeOf<NativeStructs.FileEntry>();
-        
-        // Loop through the array to free the individual string pointers
-        for (var i = 0; i < list.Count; i++)
-        {
-            var currentPos = list.Items + (i * sizeOfEntry);
-            var entry = Marshal.PtrToStructure<NativeStructs.FileEntry>(currentPos);
-            
-            if (entry.FilePath != IntPtr.Zero)
-            {
-                Marshal.FreeCoTaskMem(entry.FilePath);
-            }
-        }
-        
-        Log.Info($"Cleaning up memory for {list.Count} item(s) done");
-        // Free the array block itself
-        Marshal.FreeCoTaskMem(list.Items);
     }
 }
